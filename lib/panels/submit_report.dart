@@ -1,11 +1,39 @@
+import 'dart:convert';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import '../services/auth_service.dart';
 import '../main.dart';
 
-// ─── Data ─────────────────────────────────────────────────────────────────────
+const _mlApiBase = 'http://10.0.2.2:8000';
+
+class _MlResult {
+  final String severity;
+  final double confidence;
+  final Map<String, double> scores;
+  final String message;
+
+  _MlResult({
+    required this.severity,
+    required this.confidence,
+    required this.scores,
+    required this.message,
+  });
+
+  factory _MlResult.fromJson(Map<String, dynamic> j) => _MlResult(
+    severity: j['severity'] ?? 'Unknown',
+    confidence: (j['severity_confidence'] ?? 0).toDouble(),
+    scores: Map<String, double>.from(
+      (j['severity_scores'] as Map? ?? {}).map(
+        (k, v) => MapEntry(k.toString(), (v as num).toDouble()),
+      ),
+    ),
+    message: j['message'] ?? '',
+  );
+}
+
 const _categories = [
   'Flooding',
   'Fire',
@@ -21,7 +49,6 @@ const _severityDescriptions = {
   'Low': 'Minor concern addressable in routine operations.',
 };
 
-// ─── Screen ───────────────────────────────────────────────────────────────────
 class SubmitReportScreen extends StatefulWidget {
   const SubmitReportScreen({super.key});
 
@@ -45,7 +72,10 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
   String? _selectedSeverity;
   bool _submitting = false;
 
-  // Location
+  _MlResult? _mlResult;
+  bool _classifying = false;
+  bool _mlOverridden = false;
+
   double? _pinnedLat;
   double? _pinnedLng;
   bool _gettingLocation = false;
@@ -65,25 +95,31 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
     )..repeat();
 
     _slideAnims = List.generate(
-      7,
-      (i) =>
-          Tween<Offset>(begin: const Offset(0, 0.08), end: Offset.zero).animate(
-            CurvedAnimation(
-              parent: _enterCtrl,
-              curve: Interval(
-                i * 0.08,
-                0.6 + i * 0.07,
-                curve: Curves.easeOutCubic,
-              ),
-            ),
+      8,
+      (i) => Tween<Offset>(
+        begin: const Offset(0, 0.08),
+        end: Offset.zero,
+      ).animate(
+        CurvedAnimation(
+          parent: _enterCtrl,
+          curve: Interval(
+            (i * 0.08).clamp(0.0, 1.0),
+            (0.6 + i * 0.07).clamp(0.0, 1.0),
+            curve: Curves.easeOutCubic,
           ),
+        ),
+      ),
     );
     _fadeAnims = List.generate(
-      7,
+      8,
       (i) => Tween<double>(begin: 0, end: 1).animate(
         CurvedAnimation(
           parent: _enterCtrl,
-          curve: Interval(i * 0.08, 0.6 + i * 0.07, curve: Curves.easeOut),
+          curve: Interval(
+            (i * 0.08).clamp(0.0, 1.0),
+            (0.6 + i * 0.07).clamp(0.0, 1.0),
+            curve: Curves.easeOut,
+          ),
         ),
       ),
     );
@@ -105,13 +141,13 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
   );
 
   Color _severityColor(String s) => switch (s) {
-    'High' => AppColors.red,
+    'High' || 'Critical' => AppColors.red,
     'Medium' => AppColors.amber,
     _ => AppColors.green,
   };
 
   IconData _severityIcon(String s) => switch (s) {
-    'High' => Icons.warning_rounded,
+    'High' || 'Critical' => Icons.warning_rounded,
     'Medium' => Icons.report_problem_outlined,
     _ => Icons.check_circle_outline,
   };
@@ -124,18 +160,49 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
     _ => Icons.report_outlined,
   };
 
-  // ── LOCATION ──────────────────────────────────────────────────────────────
+  Future<void> _classifyDescription() async {
+    final text = _descriptionCtrl.text.trim();
+    if (text.isEmpty) return;
+
+    setState(() {
+      _classifying = true;
+      _mlOverridden = false;
+    });
+
+    try {
+      final response = await http
+          .post(
+            Uri.parse('$_mlApiBase/classify'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'report_text': text}),
+          )
+          .timeout(const Duration(seconds: 15));
+
+      if (response.statusCode == 200) {
+        final result = _MlResult.fromJson(jsonDecode(response.body));
+        setState(() {
+          _mlResult = result;
+          final mlSev = result.severity == 'Critical' ? 'High' : result.severity;
+          if (_severityLevels.contains(mlSev)) {
+            _selectedSeverity = mlSev;
+          }
+        });
+      }
+    } catch (_) {
+    } finally {
+      if (mounted) setState(() => _classifying = false);
+    }
+  }
+
   Future<void> _getCurrentLocation() async {
     setState(() => _gettingLocation = true);
     try {
-      // Check if location services are enabled
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         _showError('LOCATION SERVICES ARE DISABLED. ENABLE GPS AND TRY AGAIN.');
         return;
       }
 
-      // Check/request permissions
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
@@ -145,20 +212,15 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
         }
       }
       if (permission == LocationPermission.deniedForever) {
-        _showError(
-          'LOCATION PERMISSION PERMANENTLY DENIED. ENABLE IN DEVICE SETTINGS.',
-        );
+        _showError('LOCATION PERMISSION PERMANENTLY DENIED. ENABLE IN DEVICE SETTINGS.');
         return;
       }
 
       Position? position;
-
-      // ── Step 1: Try last known position first (instant, no timeout risk) ──
       try {
         position = await Geolocator.getLastKnownPosition();
       } catch (_) {}
 
-      // ── Step 2: If no last known, try medium accuracy with short timeout ──
       if (position == null) {
         try {
           position = await Geolocator.getCurrentPosition(
@@ -170,7 +232,6 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
         } catch (_) {}
       }
 
-      // ── Step 3: Final fallback — low accuracy, longer timeout ──
       if (position == null) {
         position = await Geolocator.getCurrentPosition(
           locationSettings: const LocationSettings(
@@ -196,11 +257,7 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
           ),
           content: Row(
             children: [
-              const Icon(
-                Icons.check_circle_outline,
-                color: AppColors.green,
-                size: 14,
-              ),
+              const Icon(Icons.check_circle_outline, color: AppColors.green, size: 14),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
@@ -219,12 +276,9 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
       );
     } catch (e) {
       if (!mounted) return;
-      // ── Friendly timeout message instead of raw exception ──
       final msg = e.toString().toLowerCase();
       if (msg.contains('timeout') || msg.contains('timeoutexception')) {
-        _showError(
-          'GPS SIGNAL TIMEOUT — MOVE TO AN OPEN AREA OR ENABLE WIFI/MOBILE DATA TO ASSIST LOCATION.',
-        );
+        _showError('GPS SIGNAL TIMEOUT — MOVE TO AN OPEN AREA OR ENABLE WIFI/MOBILE DATA.');
       } else {
         _showError('LOCATION ERROR: ${e.toString().toUpperCase()}');
       }
@@ -240,7 +294,6 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
     });
   }
 
-  // ── SUBMIT ────────────────────────────────────────────────────────────────
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     if (_selectedCategory == null) {
@@ -254,13 +307,16 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
 
     setState(() => _submitting = true);
     try {
-      // Cross-field: need at least GPS coords OR a description
       final hasDesc = _descriptionCtrl.text.trim().isNotEmpty;
       final hasGps = _pinnedLat != null;
       if (!hasGps && !hasDesc) {
         _showError('PIN A GPS LOCATION OR ENTER AN INCIDENT DESCRIPTION');
         setState(() => _submitting = false);
         return;
+      }
+
+      if (_mlResult == null && hasDesc) {
+        await _classifyDescription();
       }
 
       final user = _supabase.auth.currentUser;
@@ -274,6 +330,9 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
         'lng': _pinnedLng,
         'category': _selectedCategory,
         'severity': _selectedSeverity,
+        'ml_severity': _mlResult?.severity,
+        'ml_confidence': _mlResult?.confidence,
+        'ml_overridden': _mlOverridden,
         'status': 'Pending',
         'barangay': userData?['barangay'] ?? 'Del Rosario',
       });
@@ -295,10 +354,7 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(4),
-          side: BorderSide(
-            color: AppColors.red.withValues(alpha: 0.6),
-            width: 1,
-          ),
+          side: BorderSide(color: AppColors.red.withValues(alpha: 0.6), width: 1),
         ),
         content: Row(
           children: [
@@ -351,9 +407,7 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                     decoration: BoxDecoration(
                       color: AppColors.green.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(4),
-                      border: Border.all(
-                        color: AppColors.green.withValues(alpha: 0.3),
-                      ),
+                      border: Border.all(color: AppColors.green.withValues(alpha: 0.3)),
                       boxShadow: [
                         BoxShadow(
                           color: AppColors.green.withValues(alpha: 0.2),
@@ -362,11 +416,7 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                         ),
                       ],
                     ),
-                    child: const Icon(
-                      Icons.check_rounded,
-                      color: AppColors.green,
-                      size: 32,
-                    ),
+                    child: const Icon(Icons.check_rounded, color: AppColors.green, size: 32),
                   ),
                   const SizedBox(height: 20),
                   const Text(
@@ -379,30 +429,50 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                       letterSpacing: 3,
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 10),
+                  if (_mlResult != null)
+                    Container(
+                      width: double.infinity,
+                      margin: const EdgeInsets.only(bottom: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: _severityColor(_mlResult!.severity).withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(3),
+                        border: Border.all(
+                          color: _severityColor(_mlResult!.severity).withValues(alpha: 0.3),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.auto_awesome, size: 11, color: _severityColor(_mlResult!.severity)),
+                          const SizedBox(width: 6),
+                          Text(
+                            'ML TRIAGE: ${_mlResult!.severity.toUpperCase()} · ${_mlResult!.confidence.toStringAsFixed(1)}% CONFIDENCE',
+                            style: TextStyle(
+                              fontFamily: 'IBMPlexMono',
+                              fontSize: 9,
+                              color: _severityColor(_mlResult!.severity),
+                              letterSpacing: 1,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   if (_pinnedLat != null)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 8),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 4,
-                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
                           color: AppColors.electric.withValues(alpha: 0.08),
                           borderRadius: BorderRadius.circular(2),
-                          border: Border.all(
-                            color: AppColors.electric.withValues(alpha: 0.25),
-                          ),
+                          border: Border.all(color: AppColors.electric.withValues(alpha: 0.25)),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(
-                              Icons.location_on,
-                              size: 10,
-                              color: AppColors.electric,
-                            ),
+                            const Icon(Icons.location_on, size: 10, color: AppColors.electric),
                             const SizedBox(width: 4),
                             Text(
                               'GPS: ${_pinnedLat!.toStringAsFixed(4)}, ${_pinnedLng!.toStringAsFixed(4)}',
@@ -418,16 +488,11 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                       ),
                     ),
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 4,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: AppColors.green.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(2),
-                      border: Border.all(
-                        color: AppColors.green.withValues(alpha: 0.25),
-                      ),
+                      border: Border.all(color: AppColors.green.withValues(alpha: 0.25)),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -496,11 +561,7 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
         backgroundColor: AppColors.ink,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back,
-            color: AppColors.textSecondary,
-            size: 20,
-          ),
+          icon: const Icon(Icons.arrow_back, color: AppColors.textSecondary, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Row(
@@ -527,10 +588,7 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
       ),
       body: Stack(
         children: [
-          CustomPaint(
-            painter: _GridPainter(),
-            size: MediaQuery.of(context).size,
-          ),
+          CustomPaint(painter: _GridPainter(), size: MediaQuery.of(context).size),
           AnimatedBuilder(
             animation: _scan,
             builder: (_, __) {
@@ -562,7 +620,6 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // ── Header banner ──────────────────────────────────
                   _animated(
                     0,
                     Container(
@@ -570,9 +627,7 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                       decoration: BoxDecoration(
                         color: AppColors.electric.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(4),
-                        border: Border.all(
-                          color: AppColors.electric.withValues(alpha: 0.2),
-                        ),
+                        border: Border.all(color: AppColors.electric.withValues(alpha: 0.2)),
                       ),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -583,17 +638,9 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                             decoration: BoxDecoration(
                               color: AppColors.electric.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(4),
-                              border: Border.all(
-                                color: AppColors.electric.withValues(
-                                  alpha: 0.2,
-                                ),
-                              ),
+                              border: Border.all(color: AppColors.electric.withValues(alpha: 0.2)),
                             ),
-                            child: const Icon(
-                              Icons.campaign_outlined,
-                              color: AppColors.electric,
-                              size: 18,
-                            ),
+                            child: const Icon(Icons.campaign_outlined, color: AppColors.electric, size: 18),
                           ),
                           const SizedBox(width: 14),
                           const Expanded(
@@ -630,7 +677,6 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                   ),
                   const SizedBox(height: 28),
 
-                  // ── Category ───────────────────────────────────────
                   _animated(1, _SectionHeader('INCIDENT CATEGORY')),
                   const SizedBox(height: 14),
                   _animated(
@@ -648,19 +694,12 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                           onTap: () => setState(() => _selectedCategory = cat),
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 150),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 10,
-                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                             decoration: BoxDecoration(
-                              color: selected
-                                  ? AppColors.electric.withValues(alpha: 0.1)
-                                  : AppColors.surface,
+                              color: selected ? AppColors.electric.withValues(alpha: 0.1) : AppColors.surface,
                               borderRadius: BorderRadius.circular(4),
                               border: Border.all(
-                                color: selected
-                                    ? AppColors.electric
-                                    : AppColors.border,
+                                color: selected ? AppColors.electric : AppColors.border,
                                 width: selected ? 1.5 : 1,
                               ),
                             ),
@@ -669,9 +708,7 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                                 Icon(
                                   _categoryIcon(cat),
                                   size: 16,
-                                  color: selected
-                                      ? AppColors.electric
-                                      : AppColors.textDim,
+                                  color: selected ? AppColors.electric : AppColors.textDim,
                                 ),
                                 const SizedBox(width: 8),
                                 Expanded(
@@ -681,9 +718,7 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                                       fontFamily: 'IBMPlexMono',
                                       fontSize: 9,
                                       fontWeight: FontWeight.w600,
-                                      color: selected
-                                          ? AppColors.electric
-                                          : AppColors.textSecondary,
+                                      color: selected ? AppColors.electric : AppColors.textSecondary,
                                       letterSpacing: 0.6,
                                     ),
                                     overflow: TextOverflow.ellipsis,
@@ -698,15 +733,14 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                   ),
                   const SizedBox(height: 28),
 
-                  // ── Severity ───────────────────────────────────────
-                  _animated(2, _SectionHeader('SEVERITY LEVEL')),
+                  _animated(2, _SectionHeader('INCIDENT DESCRIPTION')),
                   const SizedBox(height: 4),
                   _animated(
                     2,
                     const Padding(
                       padding: EdgeInsets.only(left: 11, bottom: 14),
                       child: Text(
-                        'Select the severity that best describes the situation.',
+                        'Describe the incident — ML triage will auto-suggest a severity level.',
                         style: TextStyle(
                           fontFamily: 'IBMPlexMono',
                           fontSize: 10,
@@ -718,23 +752,256 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                   ),
                   _animated(
                     2,
+                    Focus(
+                      onFocusChange: (hasFocus) {
+                        if (!hasFocus && _descriptionCtrl.text.trim().isNotEmpty) {
+                          _classifyDescription();
+                        }
+                      },
+                      child: _TacticalTextField(
+                        controller: _descriptionCtrl,
+                        label: _pinnedLat != null ? 'DESCRIPTION (OPTIONAL)' : 'DESCRIPTION',
+                        hint: _pinnedLat != null
+                            ? 'Describe the situation… (optional if GPS pinned)'
+                            : 'Describe the situation…',
+                        icon: Icons.edit_note_rounded,
+                        maxLines: 5,
+                        maxLength: 500,
+                        validator: (v) {
+                          if (_pinnedLat != null) {
+                            if (v != null && v.trim().isNotEmpty && v.trim().length < 5) {
+                              return 'DESCRIPTION IS TOO SHORT';
+                            }
+                            return null;
+                          }
+                          if (v == null || v.trim().isEmpty) {
+                            return 'DESCRIPTION IS REQUIRED (OR PIN YOUR GPS LOCATION)';
+                          }
+                          if (v.trim().length < 10) return 'DESCRIPTION IS TOO SHORT';
+                          return null;
+                        },
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+
+                  _animated(
+                    2,
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        GestureDetector(
+                          onTap: _classifying ? null : _classifyDescription,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+                            decoration: BoxDecoration(
+                              color: AppColors.surface,
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(color: AppColors.border),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                if (_classifying)
+                                  const SizedBox(
+                                    width: 12,
+                                    height: 12,
+                                    child: CircularProgressIndicator(color: AppColors.electric, strokeWidth: 1.5),
+                                  )
+                                else
+                                  const Icon(Icons.auto_awesome, size: 13, color: AppColors.electric),
+                                const SizedBox(width: 8),
+                                Text(
+                                  _classifying ? 'ANALYZING...' : 'AUTO-CLASSIFY SEVERITY',
+                                  style: const TextStyle(
+                                    fontFamily: 'Rajdhani',
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.electric,
+                                    letterSpacing: 2,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        if (_mlResult != null) ...[
+                          const SizedBox(height: 8),
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: _severityColor(_mlResult!.severity).withValues(alpha: 0.06),
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(
+                                color: _severityColor(_mlResult!.severity).withValues(alpha: 0.3),
+                              ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(Icons.auto_awesome, size: 11, color: _severityColor(_mlResult!.severity)),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      'ML TRIAGE RESULT',
+                                      style: TextStyle(
+                                        fontFamily: 'IBMPlexMono',
+                                        fontSize: 9,
+                                        color: _severityColor(_mlResult!.severity),
+                                        letterSpacing: 1.5,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const Spacer(),
+                                    if (_mlOverridden)
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.amber.withValues(alpha: 0.1),
+                                          borderRadius: BorderRadius.circular(2),
+                                          border: Border.all(color: AppColors.amber.withValues(alpha: 0.3)),
+                                        ),
+                                        child: const Text(
+                                          'OVERRIDDEN',
+                                          style: TextStyle(
+                                            fontFamily: 'IBMPlexMono',
+                                            fontSize: 8,
+                                            color: AppColors.amber,
+                                            letterSpacing: 1,
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    Text(
+                                      _mlResult!.severity.toUpperCase(),
+                                      style: TextStyle(
+                                        fontFamily: 'Rajdhani',
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w800,
+                                        color: _severityColor(_mlResult!.severity),
+                                        letterSpacing: 2,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Text(
+                                      '${_mlResult!.confidence.toStringAsFixed(1)}% CONFIDENCE',
+                                      style: const TextStyle(
+                                        fontFamily: 'IBMPlexMono',
+                                        fontSize: 9,
+                                        color: AppColors.textSecondary,
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                ..._mlResult!.scores.entries.map((e) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 4),
+                                  child: Row(
+                                    children: [
+                                      SizedBox(
+                                        width: 52,
+                                        child: Text(
+                                          e.key.toUpperCase(),
+                                          style: const TextStyle(
+                                            fontFamily: 'IBMPlexMono',
+                                            fontSize: 8,
+                                            color: AppColors.textDim,
+                                            letterSpacing: 0.8,
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Stack(
+                                          children: [
+                                            Container(
+                                              height: 4,
+                                              decoration: BoxDecoration(
+                                                color: AppColors.border,
+                                                borderRadius: BorderRadius.circular(2),
+                                              ),
+                                            ),
+                                            FractionallySizedBox(
+                                              widthFactor: (e.value / 100).clamp(0, 1),
+                                              child: Container(
+                                                height: 4,
+                                                decoration: BoxDecoration(
+                                                  color: _severityColor(e.key),
+                                                  borderRadius: BorderRadius.circular(2),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        '${e.value.toStringAsFixed(0)}%',
+                                        style: const TextStyle(
+                                          fontFamily: 'IBMPlexMono',
+                                          fontSize: 8,
+                                          color: AppColors.textDim,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 28),
+
+                  _animated(3, _SectionHeader('SEVERITY LEVEL')),
+                  const SizedBox(height: 4),
+                  _animated(
+                    3,
+                    Padding(
+                      padding: const EdgeInsets.only(left: 11, bottom: 14),
+                      child: Text(
+                        _mlResult != null
+                            ? 'ML has suggested a level. You may override below.'
+                            : 'Select the severity that best describes the situation.',
+                        style: const TextStyle(
+                          fontFamily: 'IBMPlexMono',
+                          fontSize: 10,
+                          color: AppColors.textDim,
+                          letterSpacing: 0.3,
+                        ),
+                      ),
+                    ),
+                  ),
+                  _animated(
+                    3,
                     Column(
                       children: _severityLevels.map((sev) {
                         final selected = _selectedSeverity == sev;
                         final color = _severityColor(sev);
+                        final isMlSuggested = _mlResult != null &&
+                            (_mlResult!.severity == sev ||
+                                (_mlResult!.severity == 'Critical' && sev == 'High'));
                         return GestureDetector(
-                          onTap: () => setState(() => _selectedSeverity = sev),
+                          onTap: () => setState(() {
+                            _selectedSeverity = sev;
+                            if (_mlResult != null && !isMlSuggested) {
+                              _mlOverridden = true;
+                            }
+                          }),
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 150),
                             margin: const EdgeInsets.only(bottom: 8),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 12,
-                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                             decoration: BoxDecoration(
-                              color: selected
-                                  ? color.withValues(alpha: 0.07)
-                                  : AppColors.surface,
+                              color: selected ? color.withValues(alpha: 0.07) : AppColors.surface,
                               borderRadius: BorderRadius.circular(4),
                               border: Border.all(
                                 color: selected ? color : AppColors.border,
@@ -749,33 +1016,47 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                                   decoration: BoxDecoration(
                                     color: color.withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(3),
-                                    border: Border.all(
-                                      color: color.withValues(alpha: 0.3),
-                                    ),
+                                    border: Border.all(color: color.withValues(alpha: 0.3)),
                                   ),
-                                  child: Icon(
-                                    _severityIcon(sev),
-                                    color: color,
-                                    size: 16,
-                                  ),
+                                  child: Icon(_severityIcon(sev), color: color, size: 16),
                                 ),
                                 const SizedBox(width: 14),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        sev.toUpperCase(),
-                                        style: TextStyle(
-                                          fontFamily: 'Rajdhani',
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w700,
-                                          color: selected
-                                              ? color
-                                              : AppColors.textPrimary,
-                                          letterSpacing: 2,
-                                        ),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            sev.toUpperCase(),
+                                            style: TextStyle(
+                                              fontFamily: 'Rajdhani',
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w700,
+                                              color: selected ? color : AppColors.textPrimary,
+                                              letterSpacing: 2,
+                                            ),
+                                          ),
+                                          if (isMlSuggested) ...[
+                                            const SizedBox(width: 6),
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                                              decoration: BoxDecoration(
+                                                color: AppColors.electric.withValues(alpha: 0.12),
+                                                borderRadius: BorderRadius.circular(2),
+                                              ),
+                                              child: const Text(
+                                                'ML',
+                                                style: TextStyle(
+                                                  fontFamily: 'IBMPlexMono',
+                                                  fontSize: 7,
+                                                  color: AppColors.electric,
+                                                  letterSpacing: 1,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ],
                                       ),
                                       Text(
                                         _severityDescriptions[sev]!,
@@ -790,12 +1071,7 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                                     ],
                                   ),
                                 ),
-                                if (selected)
-                                  Icon(
-                                    Icons.check_rounded,
-                                    color: color,
-                                    size: 16,
-                                  ),
+                                if (selected) Icon(Icons.check_rounded, color: color, size: 16),
                               ],
                             ),
                           ),
@@ -805,22 +1081,17 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                   ),
                   const SizedBox(height: 28),
 
-                  // ── Location ───────────────────────────────────────
-                  _animated(3, _SectionHeader('LOCATION')),
+                  _animated(4, _SectionHeader('LOCATION')),
                   const SizedBox(height: 14),
-
-                  // GPS Pin button
                   _animated(
-                    3,
+                    4,
                     _pinnedLat != null
                         ? Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
                               color: AppColors.green.withValues(alpha: 0.07),
                               borderRadius: BorderRadius.circular(4),
-                              border: Border.all(
-                                color: AppColors.green.withValues(alpha: 0.3),
-                              ),
+                              border: Border.all(color: AppColors.green.withValues(alpha: 0.3)),
                             ),
                             child: Row(
                               children: [
@@ -828,22 +1099,15 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                                   width: 32,
                                   height: 32,
                                   decoration: BoxDecoration(
-                                    color: AppColors.green.withValues(
-                                      alpha: 0.1,
-                                    ),
+                                    color: AppColors.green.withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(3),
                                   ),
-                                  child: const Icon(
-                                    Icons.location_on,
-                                    color: AppColors.green,
-                                    size: 16,
-                                  ),
+                                  child: const Icon(Icons.location_on, color: AppColors.green, size: 16),
                                 ),
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       const Text(
                                         'GPS LOCATION PINNED',
@@ -872,37 +1136,23 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                                   child: Container(
                                     padding: const EdgeInsets.all(6),
                                     decoration: BoxDecoration(
-                                      color: AppColors.red.withValues(
-                                        alpha: 0.1,
-                                      ),
+                                      color: AppColors.red.withValues(alpha: 0.1),
                                       borderRadius: BorderRadius.circular(3),
                                     ),
-                                    child: const Icon(
-                                      Icons.close,
-                                      size: 14,
-                                      color: AppColors.red,
-                                    ),
+                                    child: const Icon(Icons.close, size: 14, color: AppColors.red),
                                   ),
                                 ),
                               ],
                             ),
                           )
                         : GestureDetector(
-                            onTap: _gettingLocation
-                                ? null
-                                : _getCurrentLocation,
+                            onTap: _gettingLocation ? null : _getCurrentLocation,
                             child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 14,
-                                horizontal: 16,
-                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                               decoration: BoxDecoration(
                                 color: AppColors.surface,
                                 borderRadius: BorderRadius.circular(4),
-                                border: Border.all(
-                                  color: AppColors.border,
-                                  style: BorderStyle.solid,
-                                ),
+                                border: Border.all(color: AppColors.border),
                               ),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -911,22 +1161,13 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                                     const SizedBox(
                                       width: 14,
                                       height: 14,
-                                      child: CircularProgressIndicator(
-                                        color: AppColors.electric,
-                                        strokeWidth: 2,
-                                      ),
+                                      child: CircularProgressIndicator(color: AppColors.electric, strokeWidth: 2),
                                     )
                                   else
-                                    const Icon(
-                                      Icons.my_location_rounded,
-                                      size: 16,
-                                      color: AppColors.electric,
-                                    ),
+                                    const Icon(Icons.my_location_rounded, size: 16, color: AppColors.electric),
                                   const SizedBox(width: 10),
                                   Text(
-                                    _gettingLocation
-                                        ? 'ACQUIRING GPS SIGNAL...'
-                                        : 'PIN MY CURRENT LOCATION',
+                                    _gettingLocation ? 'ACQUIRING GPS SIGNAL...' : 'PIN MY CURRENT LOCATION',
                                     style: const TextStyle(
                                       fontFamily: 'Rajdhani',
                                       fontSize: 12,
@@ -941,20 +1182,17 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                           ),
                   ),
                   const SizedBox(height: 10),
-
                   _animated(
-                    3,
+                    4,
                     _TacticalTextField(
                       controller: _locationCtrl,
-                      label:
-                          'LOCATION DESCRIPTION${_pinnedLat != null ? ' (OPTIONAL)' : ''}',
+                      label: _pinnedLat != null ? 'LOCATION DESCRIPTION (OPTIONAL)' : 'LOCATION DESCRIPTION',
                       hint: _pinnedLat != null
                           ? 'e.g. Purok 3, near the bridge (optional)'
                           : 'e.g. Purok 3, near the bridge',
                       icon: Icons.location_on_outlined,
                       validator: (v) {
-                        if (_pinnedLat != null)
-                          return null; // GPS pinned — text optional
+                        if (_pinnedLat != null) return null;
                         if (v == null || v.trim().isEmpty) {
                           return 'PIN GPS LOCATION OR ENTER A LOCATION DESCRIPTION';
                         }
@@ -962,74 +1200,8 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                       },
                     ),
                   ),
-                  const SizedBox(height: 6),
-                  const Padding(
-                    padding: EdgeInsets.only(left: 2),
-                    child: Text(
-                      'PIN YOUR GPS LOCATION ABOVE AND/OR DESCRIBE THE LOCATION BELOW.',
-                      style: TextStyle(
-                        fontFamily: 'IBMPlexMono',
-                        fontSize: 8,
-                        color: AppColors.textDim,
-                        letterSpacing: 0.8,
-                      ),
-                    ),
-                  ),
                   const SizedBox(height: 28),
 
-                  // ── Description ────────────────────────────────────
-                  _animated(4, _SectionHeader('INCIDENT DESCRIPTION')),
-                  const SizedBox(height: 4),
-                  _animated(
-                    4,
-                    const Padding(
-                      padding: EdgeInsets.only(left: 11, bottom: 14),
-                      child: Text(
-                        'Describe the incident clearly — who, what, and how many are affected.',
-                        style: TextStyle(
-                          fontFamily: 'IBMPlexMono',
-                          fontSize: 10,
-                          color: AppColors.textDim,
-                          letterSpacing: 0.3,
-                        ),
-                      ),
-                    ),
-                  ),
-                  _animated(
-                    4,
-                    _TacticalTextField(
-                      controller: _descriptionCtrl,
-                      label:
-                          'DESCRIPTION${_pinnedLat != null ? ' (OPTIONAL)' : ''}',
-                      hint: _pinnedLat != null
-                          ? 'Describe the situation… (optional if GPS pinned)'
-                          : 'Describe the situation…',
-                      icon: Icons.edit_note_rounded,
-                      maxLines: 5,
-                      maxLength: 500,
-                      validator: (v) {
-                        if (_pinnedLat != null) {
-                          // GPS pinned — description optional, but if filled must be meaningful
-                          if (v != null &&
-                              v.trim().isNotEmpty &&
-                              v.trim().length < 5) {
-                            return 'DESCRIPTION IS TOO SHORT';
-                          }
-                          return null;
-                        }
-                        if (v == null || v.trim().isEmpty) {
-                          return 'DESCRIPTION IS REQUIRED (OR PIN YOUR GPS LOCATION)';
-                        }
-                        if (v.trim().length < 10) {
-                          return 'DESCRIPTION IS TOO SHORT';
-                        }
-                        return null;
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // ── Info notice ────────────────────────────────────
                   _animated(
                     5,
                     Container(
@@ -1037,9 +1209,7 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                       decoration: BoxDecoration(
                         color: AppColors.blue.withValues(alpha: 0.06),
                         borderRadius: BorderRadius.circular(4),
-                        border: Border.all(
-                          color: AppColors.blue.withValues(alpha: 0.2),
-                        ),
+                        border: Border.all(color: AppColors.blue.withValues(alpha: 0.2)),
                       ),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1051,16 +1221,12 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                               color: AppColors.blue.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(3),
                             ),
-                            child: const Icon(
-                              Icons.info_outline_rounded,
-                              color: AppColors.blue,
-                              size: 14,
-                            ),
+                            child: const Icon(Icons.info_outline_rounded, color: AppColors.blue, size: 14),
                           ),
                           const SizedBox(width: 12),
                           const Expanded(
                             child: Text(
-                              'GPS coordinates allow description and location text to be optional. If no GPS is pinned, both fields are required.',
+                              'ML triage auto-suggests severity based on your description. You may override the suggestion before submitting.',
                               style: TextStyle(
                                 fontFamily: 'IBMPlexMono',
                                 fontSize: 10,
@@ -1076,7 +1242,6 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                   ),
                   const SizedBox(height: 24),
 
-                  // ── Submit ─────────────────────────────────────────
                   _animated(
                     6,
                     SizedBox(
@@ -1085,24 +1250,15 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                       child: _submitting
                           ? Container(
                               decoration: BoxDecoration(
-                                color: AppColors.electric.withValues(
-                                  alpha: 0.1,
-                                ),
+                                color: AppColors.electric.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(4),
-                                border: Border.all(
-                                  color: AppColors.electric.withValues(
-                                    alpha: 0.3,
-                                  ),
-                                ),
+                                border: Border.all(color: AppColors.electric.withValues(alpha: 0.3)),
                               ),
                               child: const Center(
                                 child: SizedBox(
                                   width: 20,
                                   height: 20,
-                                  child: CircularProgressIndicator(
-                                    color: AppColors.electric,
-                                    strokeWidth: 2,
-                                  ),
+                                  child: CircularProgressIndicator(color: AppColors.electric, strokeWidth: 2),
                                 ),
                               ),
                             )
@@ -1124,8 +1280,6 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
     );
   }
 }
-
-// ─── Sub-widgets ──────────────────────────────────────────────────────────────
 
 class _SectionHeader extends StatelessWidget {
   final String label;
@@ -1191,62 +1345,22 @@ class _TacticalTextField extends StatelessWidget {
           maxLines: maxLines,
           maxLength: maxLength,
           validator: validator,
-          style: const TextStyle(
-            fontFamily: 'IBMPlexMono',
-            fontSize: 13,
-            color: AppColors.textPrimary,
-          ),
+          style: const TextStyle(fontFamily: 'IBMPlexMono', fontSize: 13, color: AppColors.textPrimary),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: const TextStyle(
-              fontFamily: 'IBMPlexMono',
-              color: AppColors.textDim,
-              fontSize: 12,
-            ),
+            hintStyle: const TextStyle(fontFamily: 'IBMPlexMono', color: AppColors.textDim, fontSize: 12),
             prefixIcon: Icon(icon, size: 16, color: AppColors.textSecondary),
             filled: true,
             fillColor: AppColors.surface,
             alignLabelWithHint: true,
-            counterStyle: const TextStyle(
-              fontFamily: 'IBMPlexMono',
-              fontSize: 9,
-              color: AppColors.textDim,
-            ),
-            contentPadding: const EdgeInsets.symmetric(
-              vertical: 15,
-              horizontal: 14,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(4),
-              borderSide: const BorderSide(color: AppColors.border),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(4),
-              borderSide: const BorderSide(color: AppColors.border),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(4),
-              borderSide: const BorderSide(
-                color: AppColors.electric,
-                width: 1.5,
-              ),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(4),
-              borderSide: BorderSide(
-                color: AppColors.red.withValues(alpha: 0.6),
-              ),
-            ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(4),
-              borderSide: const BorderSide(color: AppColors.red, width: 1.5),
-            ),
-            errorStyle: const TextStyle(
-              fontFamily: 'IBMPlexMono',
-              fontSize: 9,
-              color: AppColors.red,
-              letterSpacing: 0.5,
-            ),
+            counterStyle: const TextStyle(fontFamily: 'IBMPlexMono', fontSize: 9, color: AppColors.textDim),
+            contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 14),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(4), borderSide: const BorderSide(color: AppColors.border)),
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(4), borderSide: const BorderSide(color: AppColors.border)),
+            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(4), borderSide: const BorderSide(color: AppColors.electric, width: 1.5)),
+            errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(4), borderSide: BorderSide(color: AppColors.red.withValues(alpha: 0.6))),
+            focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(4), borderSide: const BorderSide(color: AppColors.red, width: 1.5)),
+            errorStyle: const TextStyle(fontFamily: 'IBMPlexMono', fontSize: 9, color: AppColors.red, letterSpacing: 0.5),
           ),
         ),
       ],
@@ -1297,13 +1411,7 @@ class _TacticalButtonState extends State<_TacticalButton> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (widget.icon != null) ...[
-              Icon(
-                widget.icon,
-                size: 15,
-                color: widget.primary
-                    ? AppColors.textPrimary
-                    : AppColors.textSecondary,
-              ),
+              Icon(widget.icon, size: 15, color: widget.primary ? AppColors.textPrimary : AppColors.textSecondary),
               const SizedBox(width: 8),
             ],
             Text(
@@ -1312,9 +1420,7 @@ class _TacticalButtonState extends State<_TacticalButton> {
                 fontFamily: 'Rajdhani',
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
-                color: widget.primary
-                    ? AppColors.textPrimary
-                    : AppColors.textSecondary,
+                color: widget.primary ? AppColors.textPrimary : AppColors.textSecondary,
                 letterSpacing: 2.5,
               ),
             ),
@@ -1324,8 +1430,6 @@ class _TacticalButtonState extends State<_TacticalButton> {
     );
   }
 }
-
-// ─── Painters ─────────────────────────────────────────────────────────────────
 
 class _CornerAccents extends StatelessWidget {
   const _CornerAccents();
@@ -1344,36 +1448,12 @@ class _CornerPainter extends CustomPainter {
     const len = 20.0;
     canvas.drawLine(const Offset(16, 16), const Offset(16 + len, 16), paint);
     canvas.drawLine(const Offset(16, 16), const Offset(16, 16 + len), paint);
-    canvas.drawLine(
-      Offset(size.width - 16, 16),
-      Offset(size.width - 16 - len, 16),
-      paint,
-    );
-    canvas.drawLine(
-      Offset(size.width - 16, 16),
-      Offset(size.width - 16, 16 + len),
-      paint,
-    );
-    canvas.drawLine(
-      Offset(16, size.height - 16),
-      Offset(16 + len, size.height - 16),
-      paint,
-    );
-    canvas.drawLine(
-      Offset(16, size.height - 16),
-      Offset(16, size.height - 16 - len),
-      paint,
-    );
-    canvas.drawLine(
-      Offset(size.width - 16, size.height - 16),
-      Offset(size.width - 16 - len, size.height - 16),
-      paint,
-    );
-    canvas.drawLine(
-      Offset(size.width - 16, size.height - 16),
-      Offset(size.width - 16, size.height - 16 - len),
-      paint,
-    );
+    canvas.drawLine(Offset(size.width - 16, 16), Offset(size.width - 16 - len, 16), paint);
+    canvas.drawLine(Offset(size.width - 16, 16), Offset(size.width - 16, 16 + len), paint);
+    canvas.drawLine(Offset(16, size.height - 16), Offset(16 + len, size.height - 16), paint);
+    canvas.drawLine(Offset(16, size.height - 16), Offset(16, size.height - 16 - len), paint);
+    canvas.drawLine(Offset(size.width - 16, size.height - 16), Offset(size.width - 16 - len, size.height - 16), paint);
+    canvas.drawLine(Offset(size.width - 16, size.height - 16), Offset(size.width - 16, size.height - 16 - len), paint);
   }
 
   @override

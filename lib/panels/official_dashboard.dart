@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart' as latlng;
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../services/auth_service.dart';
+
+// Removed auth_service.dart import
 import 'login.dart';
 import 'account_settings.dart';
 import '../main.dart';
@@ -88,6 +89,7 @@ class _OfficialDashboardState extends State<OfficialDashboard>
       begin: 0.4,
       end: 1.0,
     ).animate(CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut));
+    
     _loadUser();
     _loadReports();
   }
@@ -98,19 +100,34 @@ class _OfficialDashboardState extends State<OfficialDashboard>
     super.dispose();
   }
 
-  void _loadUser() {
-    final data = AuthService.getUserData();
-    setState(() {
-      if (data != null) {
-        _username = data['username'] ?? 'Official';
-        _fullName = '${data['first_name'] ?? ''} ${data['last_name'] ?? ''}'
-            .trim();
-        _position = data['position'] ?? '';
+  // --- SUPABASE CHANGE: Fetch real official data from your officials table ---
+  Future<void> _loadUser() async {
+    setState(() => _loadingUser = true);
+    try {
+      final userId = _supabase.auth.currentUser?.id;
+      if (userId != null) {
+        final data = await _supabase
+            .from('officials')
+            .select('username, first_name, last_name, position')
+            .eq('id', userId)
+            .maybeSingle();
+
+        if (data != null) {
+          setState(() {
+            _username = data['username'] ?? 'Official';
+            _fullName = '${data['first_name'] ?? ''} ${data['last_name'] ?? ''}'.trim();
+            _position = data['position'] ?? '';
+          });
+        }
       }
-      _loadingUser = false;
-    });
+    } catch (e) {
+      print('Error loading official profile: $e');
+    } finally {
+      if (mounted) setState(() => _loadingUser = false);
+    }
   }
 
+  // --- SUPABASE CHANGE: Added safe type casting ---
   Future<void> _loadReports() async {
     setState(() => _loadingReports = true);
     try {
@@ -119,10 +136,14 @@ class _OfficialDashboardState extends State<OfficialDashboard>
           .select()
           .order('submitted_at', ascending: false)
           .limit(100);
+          
       setState(() {
-        _reports = (data as List).map((r) => _Report.fromMap(r)).toList();
+        _reports = (data as List<dynamic>)
+            .map((r) => _Report.fromMap(r as Map<String, dynamic>))
+            .toList();
       });
-    } catch (_) {
+    } catch (e) {
+      print('Error loading reports: $e');
     } finally {
       if (mounted) setState(() => _loadingReports = false);
     }
@@ -191,13 +212,15 @@ class _OfficialDashboardState extends State<OfficialDashboard>
     }
   }
 
+  // --- SUPABASE CHANGE: Native Supabase Sign Out ---
   Future<void> _logout() async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => const _LogoutDialog(),
     );
     if (confirmed == true) {
-      await AuthService.logout();
+      await _supabase.auth.signOut();
+      
       if (!mounted) return;
       Navigator.pushAndRemoveUntil(
         context,

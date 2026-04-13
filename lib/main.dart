@@ -7,13 +7,13 @@ import 'panels/resident_dashboard.dart';
 import 'panels/official_dashboard.dart';
 import 'services/auth_service.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Initialize the Supabase client
   await Supabase.initialize(
-    url: 'https://vvnktdrdcwbnmbsdjqil.supabase.co',
-    anonKey:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ2bmt0ZHJkY3dibm1ic2RqcWlsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0MTk0NDAsImV4cCI6MjA4Nzk5NTQ0MH0.Rxvol7uZXIuM8dgE0cNR7QTtHFnDavrbyNAUhzgxByg',
+    url: 'https://pxwhqcvbnoqzzozblctj.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB4d2hxY3Zibm9xenpvemJsY3RqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1MzI3MTEsImV4cCI6MjA4NzEwODcxMX0.HQav5ww4qvUVl-UB5JKVW7RkSEH7k50jOdJ0ierUXvE',
   );
 
   runApp(const MyApp());

@@ -1,13 +1,11 @@
 """
 TRAIN.PY - Full ML Pipeline
 Combines:
-  1. Kaggle NLP Disaster Tweets (train.csv) — for pre-training disaster vs non-disaster
-  2. Your Filipino barangay reports (reports.csv) — for fine-tuning severity classification
+  1. Kaggle NLP Disaster Tweets (train.csv)
+  2. Your Filipino barangay reports (reports.csv)
 
-Run this on your PC (NOT on the phone):
-    python train.py
-
-Output: saved_model/ folder — this is what api.py loads
+Run: python train.py
+Output: saved_model/
 """
 
 import os
@@ -29,19 +27,19 @@ from torch.utils.data import Dataset
 
 # ─── CONFIG ──────────────────────────────────────────────────────────────────
 MODEL_NAME      = "jcblaise/roberta-tagalog-base"
-KAGGLE_CSV      = "data/train.csv"       # ← Kaggle dataset goes here
-LOCAL_CSV       = "data/reports.csv"     # ← Your Filipino data
+KAGGLE_CSV      = "data/train.csv"
+LOCAL_CSV       = "data/reports.csv"
 MODEL_OUTPUT    = "saved_model/"
 MAX_LENGTH      = 128
 BATCH_SIZE      = 16
 EPOCHS          = 5
 
-# ─── STEP 1: LOAD AND COMBINE DATASETS ───────────────────────────────────────
+# ─── STEP 1: LOAD DATASETS ───────────────────────────────────────────────────
 
 def load_kaggle_data(path):
     print("Loading Kaggle dataset...")
     df = pd.read_csv(path)
-    df = df[df['target'] == 1].copy()   # keep only real disaster tweets
+    df = df[df['target'] == 1].copy()
     df = df[['text']].rename(columns={'text': 'report_text'})
 
     def assign_severity(text):
@@ -70,7 +68,7 @@ def load_local_data(path):
 
 def combine_datasets(kaggle_df, local_df):
     print("Combining datasets...")
-    local_boosted = pd.concat([local_df] * 3, ignore_index=True)  # 3x weight to local
+    local_boosted = pd.concat([local_df] * 3, ignore_index=True)
     combined = pd.concat([kaggle_df, local_boosted], ignore_index=True)
     combined = combined.sample(frac=1, random_state=42).reset_index(drop=True)
     print(f"   Total rows: {len(combined)}")
@@ -136,7 +134,7 @@ def train(df):
         num_train_epochs=EPOCHS,
         per_device_train_batch_size=BATCH_SIZE,
         per_device_eval_batch_size=BATCH_SIZE,
-        evaluation_strategy="epoch",
+        eval_strategy="epoch",
         save_strategy="epoch",
         load_best_model_at_end=True,
         logging_dir="./logs",
@@ -158,7 +156,7 @@ def train(df):
     model.save_pretrained(MODEL_OUTPUT)
     tokenizer.save_pretrained(MODEL_OUTPUT)
     print(f"\nModel saved to: {MODEL_OUTPUT}")
-    print("Now run: uvicorn api:app --host 0.0.0.0 --port 8000")
+    print("Now run: python -m uvicorn api:app --host 0.0.0.0 --port 8000 --reload")
 
 # ─── MAIN ─────────────────────────────────────────────────────────────────────
 
@@ -166,7 +164,6 @@ if __name__ == "__main__":
     if not os.path.exists(KAGGLE_CSV):
         print(f"ERROR: {KAGGLE_CSV} not found!")
         print("Download train.csv from: kaggle.com/competitions/nlp-getting-started/data")
-        print("Put it in your data/ folder.")
         exit(1)
 
     if not os.path.exists(LOCAL_CSV):

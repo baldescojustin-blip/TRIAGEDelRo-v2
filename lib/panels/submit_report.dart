@@ -7,7 +7,7 @@ import 'package:geolocator/geolocator.dart';
 import '../services/auth_service.dart';
 import '../main.dart';
 
-const _mlApiBase = 'http://10.0.2.2:8000';
+const _mlApiBase = 'http://192.168.100.134:8000';
 
 class _MlResult {
   final String severity;
@@ -330,9 +330,6 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
         'lng': _pinnedLng,
         'category': _selectedCategory,
         'severity': _selectedSeverity,
-        'ml_severity': _mlResult?.severity,
-        'ml_confidence': _mlResult?.confidence,
-        'ml_overridden': _mlOverridden,
         'status': 'Pending',
         'barangay': userData?['barangay'] ?? 'Del Rosario',
       });
@@ -901,7 +898,7 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                                   ],
                                 ),
                                 const SizedBox(height: 8),
-                                ..._mlResult!.scores.entries.map((e) => Padding(
+                                ..._mlResult!.scores.entries.where((e) => e.key != 'Critical').map((e) => Padding(
                                   padding: const EdgeInsets.only(bottom: 4),
                                   child: Row(
                                     children: [

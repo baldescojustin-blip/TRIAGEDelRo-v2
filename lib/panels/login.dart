@@ -163,7 +163,7 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
                         ),
                         const SizedBox(height: 20),
                         const Text(
-                          'TRIAGE DEL ROSARIO',
+                          'MY LAUD',
                           style: TextStyle(
                             fontFamily: 'Rajdhani',
                             fontSize: 28,
@@ -184,7 +184,7 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
                             const Padding(
                               padding: EdgeInsets.symmetric(horizontal: 10),
                               child: Text(
-                                'INCIDENT TRIAGE · MILAOR BDRRMC',
+                                'TRIAGE & RESPONSE · MILAOR BDRRMC',
                                 style: TextStyle(
                                   fontFamily: 'IBMPlexMono',
                                   fontSize: 9,

@@ -2,9 +2,11 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'panels/login.dart';
 import 'panels/resident_dashboard.dart';
 import 'panels/official_dashboard.dart';
+import 'panels/intro_screen.dart';
 import 'services/auth_service.dart';
 
 Future<void> main() async {
@@ -16,33 +18,41 @@ Future<void> main() async {
     anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB4d2hxY3Zibm9xenpvemJsY3RqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1MzI3MTEsImV4cCI6MjA4NzEwODcxMX0.HQav5ww4qvUVl-UB5JKVW7RkSEH7k50jOdJ0ierUXvE',
   );
 
-  runApp(const MyApp());
+  final prefs = await SharedPreferences.getInstance();
+  final seenIntro = prefs.getBool('seen_intro') ?? false;
+  if (!seenIntro) {
+    await prefs.setBool('seen_intro', true);
+  }
+
+  runApp(MyApp(showIntro: !seenIntro));
 }
 
 // ─── Design Tokens ────────────────────────────────────────────────────────────
 class AppColors {
-  static const ink = Color(0xFF080C14);
-  static const void_ = Color(0xFF0E1420);
-  static const surface = Color(0xFF141C2E);
-  static const border = Color(0xFF1E2D45);
-  static const borderHot = Color(0xFF2A3F5F);
+  // ── Enterprise Navy-Violet Theme ──────────────────────────────────────────
+  static const ink         = Color(0xFF17172B); // Main background — deep navy-violet
+  static const void_       = Color(0xFF252542); // Card background — elevated dark violet
+  static const surface     = Color(0xFF2D2D52); // Secondary surface — subtle highlight
+  static const border      = Color(0xFF3B3B5E); // Default border
+  static const borderHot   = Color(0xFF8B5CF6); // Focused border — bright violet
 
-  static const navy = Color(0xFF0D2B55);
-  static const electric = Color(0xFF1B6EF3);
-  static const electricDim = Color(0xFF1247A8);
+  static const navy        = Color(0xFF17172B); // Nav / dark elements
+  static const electric    = Color(0xFF8B5CF6); // Primary accent & buttons
+  static const electricDim = Color(0xFF6D28D9); // Deep primary fill
 
-  static const amber = Color(0xFFF59E0B);
-  static const amberDim = Color(0xFF92600A);
-  static const red = Color(0xFFEF3D3D);
-  static const redDim = Color(0xFF8B1A1A);
-  static const green = Color(0xFF10D97C);
-  static const greenDim = Color(0xFF0A7A46);
-  static const blue = Color(0xFF4A9EFF);
-  static const blueDim = Color(0xFF1A5FA8);
+  static const amber    = Color(0xFFF59E0B); // warning (Critical alerts)
+  static const amberDim = Color(0xFF78350F); // warning dim background
+  static const red      = Color(0xFFEF4444); // error
+  static const redDim   = Color(0xFF7F1D1D);
+  static const green    = Color(0xFF10B981); // success
+  static const greenDim = Color(0xFF064E3B);
+  static const blue     = Color(0xFF3B82F6); // info
+  static const blueDim  = Color(0xFF1E3A8A);
 
-  static const textPrimary = Color(0xFFE8F0FF);
-  static const textSecondary = Color(0xFF6B82A8);
-  static const textDim = Color(0xFF3D5070);
+  static const textPrimary   = Color(0xFFF8FAFC); // Light text for inside dark cards
+  static const textSecondary = Color(0xFFA78BFA); // Soft violet muted text
+  static const textDim       = Color(0xFF94A3B8); // Very dim text for secondary info
+  static const textInverse   = Color(0xFFFFFFFF); // Pure white text for headers
 }
 
 class AppTypography {
@@ -58,35 +68,42 @@ class AppTypography {
   );
   static const body = TextStyle(
     fontFamily: 'SourceSans3',
-    color: AppColors.textSecondary,
+    color: AppColors.textPrimary,
     height: 1.5,
   );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool showIntro;
+  const MyApp({super.key, this.showIntro = false});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'TriageDelRo',
+      title: 'MyLaud',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
         scaffoldBackgroundColor: AppColors.ink,
-        colorScheme: const ColorScheme.dark(
+        colorScheme: const ColorScheme.dark( // Set to dark mode base
           primary: AppColors.electric,
-          secondary: AppColors.amber,
+          secondary: AppColors.blue,   
           surface: AppColors.void_,
+          error: AppColors.red,
+          onPrimary: Colors.white,
+          onSecondary: Colors.white,
+          onSurface: AppColors.textPrimary,
         ),
         appBarTheme: const AppBarTheme(
           backgroundColor: AppColors.ink,
-          foregroundColor: AppColors.textPrimary,
+          foregroundColor: AppColors.textInverse, // White text for dark app bar
           centerTitle: false,
           elevation: 0,
+          shadowColor: Color(0x0C000000),
+          surfaceTintColor: Colors.transparent,
           titleTextStyle: TextStyle(
             fontFamily: 'Rajdhani',
-            color: AppColors.textPrimary,
+            color: AppColors.textInverse, 
             fontSize: 20,
             fontWeight: FontWeight.w700,
             letterSpacing: 2,
@@ -135,7 +152,7 @@ class MyApp extends StatelessWidget {
           hintStyle: const TextStyle(color: AppColors.textDim, fontSize: 13),
         ),
       ),
-      home: const Splash(),
+      home: showIntro ? const IntroScreen() : const Splash(),
     );
   }
 }
@@ -252,15 +269,15 @@ class _SplashState extends State<Splash> with TickerProviderStateMixin {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _HexEmblem(size: 90),
+                  const _HexEmblem(size: 90),
                   const SizedBox(height: 32),
                   const Text(
-                    'TRIAGE',
+                    'MY LAUD',
                     style: TextStyle(
                       fontFamily: 'Rajdhani',
                       fontSize: 52,
                       fontWeight: FontWeight.w800,
-                      color: AppColors.textPrimary,
+                      color: AppColors.textInverse, // Bright white for high contrast
                       letterSpacing: 12,
                       height: 1,
                     ),
@@ -276,7 +293,7 @@ class _SplashState extends State<Splash> with TickerProviderStateMixin {
                       const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 12),
                         child: Text(
-                          'Del Rosario',
+                          'Triage & Response',
                           style: TextStyle(
                             fontFamily: 'Rajdhani',
                             fontSize: 24,
@@ -301,7 +318,7 @@ class _SplashState extends State<Splash> with TickerProviderStateMixin {
                     ),
                     decoration: BoxDecoration(
                       border: Border.all(
-                        color: AppColors.amber.withValues(alpha: 0.4),
+                        color: AppColors.amber.withValues(alpha: 0.5),
                         width: 1,
                       ),
                       borderRadius: BorderRadius.circular(2),
@@ -322,7 +339,7 @@ class _SplashState extends State<Splash> with TickerProviderStateMixin {
                     style: TextStyle(
                       fontFamily: 'IBMPlexMono',
                       fontSize: 9,
-                      color: AppColors.textDim,
+                      color: AppColors.textDim, // Dim color looks great on the dark slate background
                       letterSpacing: 2,
                     ),
                   ),
@@ -388,7 +405,7 @@ class _BootTextState extends State<_BootText> {
                 style: TextStyle(
                   fontFamily: 'IBMPlexMono',
                   fontSize: 10,
-                  color: done ? AppColors.textSecondary : AppColors.electric,
+                  color: done ? AppColors.textPrimary : AppColors.electric, 
                   letterSpacing: 1.5,
                 ),
               ),
@@ -478,7 +495,7 @@ class _GridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = AppColors.border.withValues(alpha: 0.25)
+      ..color = AppColors.electric.withValues(alpha: 0.05) // Very subtle tech grid
       ..strokeWidth = 0.5;
     const step = 48.0;
     for (double x = 0; x < size.width; x += step) {

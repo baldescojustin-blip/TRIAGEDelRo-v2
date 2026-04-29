@@ -10,6 +10,7 @@ import 'login.dart';
 import 'account_settings.dart';
 import 'submit_report.dart';
 import 'document_request.dart';
+import 'announcements_screen.dart';
 import '../main.dart';
 
 class _Report {
@@ -289,14 +290,15 @@ class _ResidentDashboardState extends State<ResidentDashboard>
           automaticallyImplyLeading: false,
           title: Row(
             children: [
-              SizedBox(
+              Image.asset(
+                'assets/images/intro_page/milaudlogo.png',
                 width: 28,
                 height: 28,
-                child: CustomPaint(painter: _MiniHexPainter()),
+                fit: BoxFit.contain,
               ),
               const SizedBox(width: 10),
               const Text(
-                'TRIAGE DEL ROSARIO',
+                'MY LAUD',
                 style: TextStyle(
                   fontFamily: 'Rajdhani',
                   fontSize: 16,
@@ -377,7 +379,64 @@ class _ResidentDashboardState extends State<ResidentDashboard>
                         onTap: _openAccountSettings,
                         pulse: _pulse,
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 20),
+
+                      // ── Quick Action Cards Row 1 ───────────────────────
+                      _SectionLabel(
+                        label: 'QUICK ACTIONS',
+                        tag: 'SELECT TO PROCEED',
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _QuickActionCard(
+                              icon: Icons.campaign_outlined,
+                              label: 'Report Issue',
+                              color: AppColors.electric,
+                              onTap: _openSubmitReport,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _QuickActionCard(
+                              icon: Icons.description_outlined,
+                              label: 'Document Request',
+                              color: AppColors.blue,
+                              onTap: _openDocumentRequest,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      // ── Quick Action Cards Row 2 ───────────────────────
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _QuickActionCard(
+                              icon: Icons.how_to_vote_outlined,
+                              label: 'Vote / Poll',
+                              color: AppColors.amber,
+                              onTap: () {}, // TODO: wire to vote/poll screen
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _QuickActionCard(
+                              icon: Icons.notifications_active_outlined,
+                              label: 'Announcements',
+                              color: AppColors.green,
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const AnnouncementsScreen()),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 28),
                       _SectionLabel(
                         label: 'SITUATION OVERVIEW',
                         tag: _timeAgo(DateTime.now()),
@@ -408,25 +467,102 @@ class _ResidentDashboardState extends State<ResidentDashboard>
                         ],
                       ),
                       const SizedBox(height: 28),
-                      _SectionLabel(
-                        label: 'MY INCIDENT LOG',
-                        tag: '${_reports.length} RECORDS',
-                      ),
-                      const SizedBox(height: 12),
-                      _loadingReports
-                          ? const Center(
-                              child: Padding(
-                                padding: EdgeInsets.all(40),
-                                child: CircularProgressIndicator(
+
+                      // ── My Incident Log — clickable icon ──────────────
+                      GestureDetector(
+                        onTap: () => _showIncidentLogSheet(context),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                          decoration: BoxDecoration(
+                            color: AppColors.void_,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: AppColors.border),
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: AppColors.electric.withOpacity(0.12),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Icon(
+                                  Icons.history_rounded,
                                   color: AppColors.electric,
-                                  strokeWidth: 2,
+                                  size: 20,
                                 ),
                               ),
-                            )
-                          : _reports.isEmpty
-                          ? _EmptyState(onSubmit: _openSubmitReport)
-                          : _buildGroupedList(),
-                      const SizedBox(height: 120),
+                              const SizedBox(width: 14),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'MY INCIDENT LOG',
+                                      style: TextStyle(
+                                        fontFamily: 'Rajdhani',
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w700,
+                                        color: AppColors.textPrimary,
+                                        letterSpacing: 1.5,
+                                      ),
+                                    ),
+                                    Text(
+                                      '${_reports.length} records — tap to view',
+                                      style: const TextStyle(
+                                        fontFamily: 'IBMPlexMono',
+                                        fontSize: 10,
+                                        color: AppColors.textSecondary,
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const Icon(
+                                Icons.chevron_right_rounded,
+                                color: AppColors.textDim,
+                                size: 20,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+                      // ── Latest Announcements Section ────────────────────────
+                      const Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'LATEST ANNOUNCEMENTS',
+                            style: TextStyle(
+                              color: AppColors.textDim,
+                              fontSize: 12,
+                              letterSpacing: 2,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            'View all',
+                            style: TextStyle(
+                              color: AppColors.electric,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      // The Preview Card
+                      const AnnouncementCard(
+                        category: 'SERVICES',
+                        date: 'MARCH 13, 2026',
+                        title: 'New Waste Collection Schedule',
+                        description: 'Please ensure segregated waste is placed outside by 8:00 AM every Tuesday and Friday.',
+                        isUrgent: true,
+                      ),
+                      const SizedBox(height: 100),
                     ],
                   ),
                 ),
@@ -438,6 +574,108 @@ class _ResidentDashboardState extends State<ResidentDashboard>
           onToggle: _toggleFab,
           onSubmitIncident: _openSubmitReport,
           onDocumentRequest: _openDocumentRequest,
+        ),
+      ),
+    );
+  }
+
+  void _showIncidentLogSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => DraggableScrollableSheet(
+        initialChildSize: 0.75,
+        minChildSize: 0.4,
+        maxChildSize: 0.95,
+        expand: false,
+        builder: (_, scrollCtrl) => Container(
+          decoration: const BoxDecoration(
+            color: AppColors.void_,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+            border: Border(
+              top: BorderSide(color: AppColors.border),
+              left: BorderSide(color: AppColors.border),
+              right: BorderSide(color: AppColors.border),
+            ),
+          ),
+          child: Column(
+            children: [
+              // Handle
+              const SizedBox(height: 12),
+              Container(
+                width: 36,
+                height: 3,
+                decoration: BoxDecoration(
+                  color: AppColors.border,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 16),
+              // Header
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: AppColors.electric.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(Icons.history_rounded, color: AppColors.electric, size: 18),
+                    ),
+                    const SizedBox(width: 12),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'MY INCIDENT LOG',
+                          style: TextStyle(
+                            fontFamily: 'Rajdhani',
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.textPrimary,
+                            letterSpacing: 2,
+                          ),
+                        ),
+                        Text(
+                          '${_reports.length} RECORDS',
+                          style: const TextStyle(
+                            fontFamily: 'IBMPlexMono',
+                            fontSize: 9,
+                            color: AppColors.textSecondary,
+                            letterSpacing: 1.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const Spacer(),
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: const Icon(Icons.close, color: AppColors.textDim, size: 18),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              Container(height: 1, color: AppColors.border),
+              const SizedBox(height: 8),
+              // Body
+              Expanded(
+                child: _loadingReports
+                    ? const Center(child: CircularProgressIndicator(color: AppColors.electric, strokeWidth: 2))
+                    : _reports.isEmpty
+                        ? _EmptyState(onSubmit: () { Navigator.pop(context); _openSubmitReport(); })
+                        : ListView(
+                            controller: scrollCtrl,
+                            padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+                            children: [_buildGroupedList()],
+                          ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -1244,6 +1482,69 @@ class _Badge extends StatelessWidget {
     ),
     child: Text(label, style: TextStyle(fontFamily: 'IBMPlexMono', fontSize: 8, fontWeight: FontWeight.w600, color: filled ? color : AppColors.textDim, letterSpacing: 1)),
   );
+}
+
+// ─── Quick Action Card ────────────────────────────────────────────────────────
+class _QuickActionCard extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _QuickActionCard({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 120,
+        decoration: BoxDecoration(
+          color: AppColors.void_,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.border),
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(0.08),
+              blurRadius: 12,
+              spreadRadius: 1,
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, color: color, size: 24),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: 'Rajdhani',
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+                letterSpacing: 0.5,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 // ─── Painters ─────────────────────────────────────────────────────────────────

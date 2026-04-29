@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:math' as math;
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -34,11 +34,20 @@ class _MlResult {
   );
 }
 
-const _categories = [
+// ─── Categories ───────────────────────────────────────────────────────────────
+const _emergencyCategories = [
   'Flooding',
   'Fire',
   'Medical Emergency',
   'Infrastructure Damage',
+];
+
+const _minorCategories = [
+  'Waste Collection',
+  'Noise Complaint',
+  'Streetlights',
+  'Road Safety',
+  'Other',
 ];
 
 const _severityLevels = ['High', 'Medium', 'Low'];
@@ -68,6 +77,9 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
   late List<Animation<double>> _fadeAnims;
   late Animation<double> _scan;
 
+  // NEW: Toggle between Emergency and Minor Concern
+  bool _isMinorConcern = false; 
+
   String? _selectedCategory;
   String? _selectedSeverity;
   bool _submitting = false;
@@ -95,7 +107,7 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
     )..repeat();
 
     _slideAnims = List.generate(
-      8,
+      10, // Increased for new elements
       (i) => Tween<Offset>(
         begin: const Offset(0, 0.08),
         end: Offset.zero,
@@ -103,21 +115,21 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
         CurvedAnimation(
           parent: _enterCtrl,
           curve: Interval(
-            (i * 0.08).clamp(0.0, 1.0),
-            (0.6 + i * 0.07).clamp(0.0, 1.0),
+            (i * 0.06).clamp(0.0, 1.0),
+            (0.6 + i * 0.05).clamp(0.0, 1.0),
             curve: Curves.easeOutCubic,
           ),
         ),
       ),
     );
     _fadeAnims = List.generate(
-      8,
+      10,
       (i) => Tween<double>(begin: 0, end: 1).animate(
         CurvedAnimation(
           parent: _enterCtrl,
           curve: Interval(
-            (i * 0.08).clamp(0.0, 1.0),
-            (0.6 + i * 0.07).clamp(0.0, 1.0),
+            (i * 0.06).clamp(0.0, 1.0),
+            (0.6 + i * 0.05).clamp(0.0, 1.0),
             curve: Curves.easeOut,
           ),
         ),
@@ -157,10 +169,33 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
     'Fire' => Icons.local_fire_department_rounded,
     'Medical Emergency' => Icons.medical_services_outlined,
     'Infrastructure Damage' => Icons.construction_rounded,
-    _ => Icons.report_outlined,
+    'Waste Collection' => Icons.delete_outline_rounded,
+    'Noise Complaint' => Icons.volume_up_outlined,
+    'Streetlights' => Icons.lightbulb_outline_rounded,
+    'Road Safety' => Icons.shield_outlined,
+    _ => Icons.more_horiz_rounded,
   };
 
+  void _switchReportType(bool isMinor) {
+    if (_isMinorConcern == isMinor) return;
+    setState(() {
+      _isMinorConcern = isMinor;
+      _selectedCategory = null; // Reset category
+      _mlResult = null; // Clear ML result
+      
+      if (isMinor) {
+        // Automatically set to low severity for minor concerns
+        _selectedSeverity = 'Low'; 
+      } else {
+        _selectedSeverity = null;
+      }
+    });
+  }
+
   Future<void> _classifyDescription() async {
+    // Don't auto-classify minor concerns
+    if (_isMinorConcern) return; 
+
     final text = _descriptionCtrl.text.trim();
     if (text.isEmpty) return;
 
@@ -219,7 +254,9 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
       Position? position;
       try {
         position = await Geolocator.getLastKnownPosition();
-      } catch (_) {}
+      } catch (_) {
+        position = null;
+      }
 
       if (position == null) {
         try {
@@ -229,21 +266,33 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
               timeLimit: Duration(seconds: 10),
             ),
           );
-        } catch (_) {}
+        } catch (_) {
+          position = null;
+        }
       }
 
       if (position == null) {
-        position = await Geolocator.getCurrentPosition(
-          locationSettings: const LocationSettings(
-            accuracy: LocationAccuracy.low,
-            timeLimit: Duration(seconds: 20),
-          ),
-        );
+        try {
+          position = await Geolocator.getCurrentPosition(
+            locationSettings: const LocationSettings(
+              accuracy: LocationAccuracy.low,
+              timeLimit: Duration(seconds: 20),
+            ),
+          );
+        } catch (_) {
+          position = null;
+        }
       }
 
+      if (position == null) {
+        _showError('UNABLE TO ACQUIRE LOCATION. TRY AGAIN IN A FEWER SECONDS OR MOVING OUTSIDE.');
+        return;
+      }
+
+      final resolvedPosition = position;
       setState(() {
-        _pinnedLat = position!.latitude;
-        _pinnedLng = position.longitude;
+        _pinnedLat = resolvedPosition.latitude;
+        _pinnedLng = resolvedPosition.longitude;
       });
 
       if (!mounted) return;
@@ -315,7 +364,7 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
         return;
       }
 
-      if (_mlResult == null && hasDesc) {
+      if (!_isMinorConcern && _mlResult == null && hasDesc) {
         await _classifyDescription();
       }
 
@@ -332,6 +381,7 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
         'severity': _selectedSeverity,
         'status': 'Pending',
         'barangay': userData?['barangay'] ?? 'Del Rosario',
+        'report_type': _isMinorConcern ? 'Minor Concern' : 'Emergency', // Optional: Good to track in DB
       });
 
       if (!mounted) return;
@@ -416,9 +466,9 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                     child: const Icon(Icons.check_rounded, color: AppColors.green, size: 32),
                   ),
                   const SizedBox(height: 20),
-                  const Text(
-                    'REPORT TRANSMITTED',
-                    style: TextStyle(
+                  Text(
+                    _isMinorConcern ? 'CONCERN LOGGED' : 'REPORT TRANSMITTED',
+                    style: const TextStyle(
                       fontFamily: 'Rajdhani',
                       fontSize: 18,
                       fontWeight: FontWeight.w800,
@@ -504,7 +554,7 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                         ),
                         const SizedBox(width: 6),
                         const Text(
-                          'STATUS: PENDING TRIAGE',
+                          'STATUS: PENDING REVIEW',
                           style: TextStyle(
                             fontFamily: 'IBMPlexMono',
                             fontSize: 9,
@@ -516,10 +566,12 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                     ),
                   ),
                   const SizedBox(height: 14),
-                  const Text(
-                    'Your report has been received and is now pending triage classification. Barangay officials will be notified immediately.',
+                  Text(
+                    _isMinorConcern 
+                      ? 'Your concern has been logged for community review. Officials will assign a resolution schedule.'
+                      : 'Your report has been received and is pending triage. Barangay officials are notified immediately.',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontFamily: 'IBMPlexMono',
                       fontSize: 10,
                       color: AppColors.textSecondary,
@@ -552,6 +604,8 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
 
   @override
   Widget build(BuildContext context) {
+    final activeCategories = _isMinorConcern ? _minorCategories : _emergencyCategories;
+
     return Scaffold(
       backgroundColor: AppColors.ink,
       appBar: AppBar(
@@ -566,7 +620,7 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
             Icon(Icons.campaign_outlined, size: 18, color: AppColors.electric),
             SizedBox(width: 8),
             Text(
-              'SUBMIT INCIDENT',
+              'SUBMIT REPORT',
               style: TextStyle(
                 fontFamily: 'Rajdhani',
                 fontSize: 16,
@@ -617,55 +671,33 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  
+                  // NEW: Segmented Control Toggle
                   _animated(
                     0,
                     Container(
-                      padding: const EdgeInsets.all(14),
+                      padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
-                        color: AppColors.electric.withValues(alpha: 0.05),
-                        borderRadius: BorderRadius.circular(4),
-                        border: Border.all(color: AppColors.electric.withValues(alpha: 0.2)),
+                        color: AppColors.void_,
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: AppColors.border),
                       ),
                       child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Container(
-                            width: 36,
-                            height: 36,
-                            decoration: BoxDecoration(
-                              color: AppColors.electric.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(4),
-                              border: Border.all(color: AppColors.electric.withValues(alpha: 0.2)),
+                          Expanded(
+                            child: _TacticalTab(
+                              label: 'EMERGENCY',
+                              icon: Icons.warning_amber_rounded,
+                              isActive: !_isMinorConcern,
+                              onTap: () => _switchReportType(false),
                             ),
-                            child: const Icon(Icons.campaign_outlined, color: AppColors.electric, size: 18),
                           ),
-                          const SizedBox(width: 14),
-                          const Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'FILE A CITIZEN REPORT',
-                                  style: TextStyle(
-                                    fontFamily: 'Rajdhani',
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w700,
-                                    color: AppColors.textPrimary,
-                                    letterSpacing: 2,
-                                  ),
-                                ),
-                                SizedBox(height: 3),
-                                Text(
-                                  'Reports are forwarded to barangay officials immediately upon submission.',
-                                  style: TextStyle(
-                                    fontFamily: 'IBMPlexMono',
-                                    fontSize: 10,
-                                    color: AppColors.textSecondary,
-                                    height: 1.6,
-                                    letterSpacing: 0.3,
-                                  ),
-                                ),
-                              ],
+                          Expanded(
+                            child: _TacticalTab(
+                              label: 'MINOR CONCERN',
+                              icon: Icons.lightbulb_outline_rounded,
+                              isActive: _isMinorConcern,
+                              onTap: () => _switchReportType(true),
                             ),
                           ),
                         ],
@@ -674,24 +706,24 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                   ),
                   const SizedBox(height: 28),
 
-                  _animated(1, _SectionHeader('INCIDENT CATEGORY')),
+                  _animated(1, _SectionHeader('CATEGORY')),
                   const SizedBox(height: 14),
                   _animated(
                     1,
                     GridView.count(
-                      crossAxisCount: 2,
+                      crossAxisCount: _isMinorConcern ? 3 : 2, // 3 columns for minor, 2 for major
                       crossAxisSpacing: 10,
                       mainAxisSpacing: 10,
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      childAspectRatio: 2.7,
-                      children: _categories.map((cat) {
+                      childAspectRatio: _isMinorConcern ? 1.5 : 2.7,
+                      children: activeCategories.map((cat) {
                         final selected = _selectedCategory == cat;
                         return GestureDetector(
                           onTap: () => setState(() => _selectedCategory = cat),
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 150),
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                             decoration: BoxDecoration(
                               color: selected ? AppColors.electric.withValues(alpha: 0.1) : AppColors.surface,
                               borderRadius: BorderRadius.circular(4),
@@ -700,29 +732,54 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                                 width: selected ? 1.5 : 1,
                               ),
                             ),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  _categoryIcon(cat),
-                                  size: 16,
-                                  color: selected ? AppColors.electric : AppColors.textDim,
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
+                            child: _isMinorConcern 
+                            ? Column( // Stack icon above text for 3-column minor layout
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    _categoryIcon(cat),
+                                    size: 20,
+                                    color: selected ? AppColors.electric : AppColors.textDim,
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
                                     cat.toUpperCase(),
+                                    textAlign: TextAlign.center,
                                     style: TextStyle(
                                       fontFamily: 'IBMPlexMono',
-                                      fontSize: 9,
+                                      fontSize: 8,
                                       fontWeight: FontWeight.w600,
                                       color: selected ? AppColors.electric : AppColors.textSecondary,
                                       letterSpacing: 0.6,
                                     ),
+                                    maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                   ),
-                                ),
-                              ],
-                            ),
+                                ],
+                              )
+                            : Row( // Side-by-side for emergency layout
+                                children: [
+                                  Icon(
+                                    _categoryIcon(cat),
+                                    size: 16,
+                                    color: selected ? AppColors.electric : AppColors.textDim,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      cat.toUpperCase(),
+                                      style: TextStyle(
+                                        fontFamily: 'IBMPlexMono',
+                                        fontSize: 9,
+                                        fontWeight: FontWeight.w600,
+                                        color: selected ? AppColors.electric : AppColors.textSecondary,
+                                        letterSpacing: 0.6,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
                           ),
                         );
                       }).toList(),
@@ -730,15 +787,17 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                   ),
                   const SizedBox(height: 28),
 
-                  _animated(2, _SectionHeader('INCIDENT DESCRIPTION')),
+                  _animated(2, _SectionHeader('DESCRIPTION')),
                   const SizedBox(height: 4),
                   _animated(
                     2,
-                    const Padding(
-                      padding: EdgeInsets.only(left: 11, bottom: 14),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 11, bottom: 14),
                       child: Text(
-                        'Describe the incident — ML triage will auto-suggest a severity level.',
-                        style: TextStyle(
+                        _isMinorConcern 
+                        ? 'Describe the issue in detail (location, time, severity).'
+                        : 'Describe the incident — ML triage will auto-suggest a severity level.',
+                        style: const TextStyle(
                           fontFamily: 'IBMPlexMono',
                           fontSize: 10,
                           color: AppColors.textDim,
@@ -782,306 +841,362 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                   ),
                   const SizedBox(height: 10),
 
-                  _animated(
-                    2,
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        GestureDetector(
-                          onTap: _classifying ? null : _classifyDescription,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
-                            decoration: BoxDecoration(
-                              color: AppColors.surface,
-                              borderRadius: BorderRadius.circular(4),
-                              border: Border.all(color: AppColors.border),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                  // Show Evidence Upload for Minor Concerns
+                  if (_isMinorConcern) ...[
+                    _animated(3, _SectionHeader('EVIDENCE')),
+                    const SizedBox(height: 14),
+                    _animated(
+                      3,
+                      GestureDetector(
+                        onTap: () {
+                          // TODO: Implement Image Picker here in the future
+                          _showError('PHOTO UPLOAD PENDING STORAGE CONFIGURATION');
+                        },
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(vertical: 24),
+                          decoration: BoxDecoration(
+                            color: AppColors.surface,
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(color: AppColors.border, width: 1.5, style: BorderStyle.none),
+                          ),
+                          child: CustomPaint(
+                            painter: _DashedBorderPainter(),
+                            child: const Column(
                               children: [
-                                if (_classifying)
-                                  const SizedBox(
-                                    width: 12,
-                                    height: 12,
-                                    child: CircularProgressIndicator(color: AppColors.electric, strokeWidth: 1.5),
-                                  )
-                                else
-                                  const Icon(Icons.auto_awesome, size: 13, color: AppColors.electric),
-                                const SizedBox(width: 8),
+                                Icon(Icons.add_a_photo_outlined, color: AppColors.electric, size: 32),
+                                SizedBox(height: 12),
                                 Text(
-                                  _classifying ? 'ANALYZING...' : 'AUTO-CLASSIFY SEVERITY',
-                                  style: const TextStyle(
+                                  'TAP TO UPLOAD PHOTOS',
+                                  style: TextStyle(
                                     fontFamily: 'Rajdhani',
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w700,
-                                    color: AppColors.electric,
-                                    letterSpacing: 2,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.textPrimary,
+                                    letterSpacing: 1,
+                                  ),
+                                ),
+                                SizedBox(height: 4),
+                                Text(
+                                  'Maximum 3 files (JPG, PNG)',
+                                  style: TextStyle(
+                                    fontFamily: 'IBMPlexMono',
+                                    fontSize: 10,
+                                    color: AppColors.textDim,
                                   ),
                                 ),
                               ],
                             ),
                           ),
                         ),
-                        if (_mlResult != null) ...[
-                          const SizedBox(height: 8),
-                          AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: _severityColor(_mlResult!.severity).withValues(alpha: 0.06),
-                              borderRadius: BorderRadius.circular(4),
-                              border: Border.all(
-                                color: _severityColor(_mlResult!.severity).withValues(alpha: 0.3),
+                      ),
+                    ),
+                    const SizedBox(height: 28),
+                  ],
+
+                  // Show ML / Severity only for Emergencies
+                  if (!_isMinorConcern) ...[
+                    _animated(
+                      3,
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          GestureDetector(
+                            onTap: _classifying ? null : _classifyDescription,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+                              decoration: BoxDecoration(
+                                color: AppColors.surface,
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(color: AppColors.border),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  if (_classifying)
+                                    const SizedBox(
+                                      width: 12,
+                                      height: 12,
+                                      child: CircularProgressIndicator(color: AppColors.electric, strokeWidth: 1.5),
+                                    )
+                                  else
+                                    const Icon(Icons.auto_awesome, size: 13, color: AppColors.electric),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    _classifying ? 'ANALYZING...' : 'AUTO-CLASSIFY SEVERITY',
+                                    style: const TextStyle(
+                                      fontFamily: 'Rajdhani',
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w700,
+                                      color: AppColors.electric,
+                                      letterSpacing: 2,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Icon(Icons.auto_awesome, size: 11, color: _severityColor(_mlResult!.severity)),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      'ML TRIAGE RESULT',
-                                      style: TextStyle(
-                                        fontFamily: 'IBMPlexMono',
-                                        fontSize: 9,
-                                        color: _severityColor(_mlResult!.severity),
-                                        letterSpacing: 1.5,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    const Spacer(),
-                                    if (_mlOverridden)
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                        decoration: BoxDecoration(
-                                          color: AppColors.amber.withValues(alpha: 0.1),
-                                          borderRadius: BorderRadius.circular(2),
-                                          border: Border.all(color: AppColors.amber.withValues(alpha: 0.3)),
+                          ),
+                          if (_mlResult != null) ...[
+                            const SizedBox(height: 8),
+                            AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: _severityColor(_mlResult!.severity).withValues(alpha: 0.06),
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(
+                                  color: _severityColor(_mlResult!.severity).withValues(alpha: 0.3),
+                                ),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Icon(Icons.auto_awesome, size: 11, color: _severityColor(_mlResult!.severity)),
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        'ML TRIAGE RESULT',
+                                        style: TextStyle(
+                                          fontFamily: 'IBMPlexMono',
+                                          fontSize: 9,
+                                          color: _severityColor(_mlResult!.severity),
+                                          letterSpacing: 1.5,
+                                          fontWeight: FontWeight.w600,
                                         ),
-                                        child: const Text(
-                                          'OVERRIDDEN',
-                                          style: TextStyle(
-                                            fontFamily: 'IBMPlexMono',
-                                            fontSize: 8,
-                                            color: AppColors.amber,
-                                            letterSpacing: 1,
+                                      ),
+                                      const Spacer(),
+                                      if (_mlOverridden)
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                          decoration: BoxDecoration(
+                                            color: AppColors.amber.withValues(alpha: 0.1),
+                                            borderRadius: BorderRadius.circular(2),
+                                            border: Border.all(color: AppColors.amber.withValues(alpha: 0.3)),
+                                          ),
+                                          child: const Text(
+                                            'OVERRIDDEN',
+                                            style: TextStyle(
+                                              fontFamily: 'IBMPlexMono',
+                                              fontSize: 8,
+                                              color: AppColors.amber,
+                                              letterSpacing: 1,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                  ],
-                                ),
-                                const SizedBox(height: 8),
-                                Row(
-                                  children: [
-                                    Text(
-                                      _mlResult!.severity.toUpperCase(),
-                                      style: TextStyle(
-                                        fontFamily: 'Rajdhani',
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w800,
-                                        color: _severityColor(_mlResult!.severity),
-                                        letterSpacing: 2,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Text(
-                                      '${_mlResult!.confidence.toStringAsFixed(1)}% CONFIDENCE',
-                                      style: const TextStyle(
-                                        fontFamily: 'IBMPlexMono',
-                                        fontSize: 9,
-                                        color: AppColors.textSecondary,
-                                        letterSpacing: 0.5,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 8),
-                                ..._mlResult!.scores.entries.where((e) => e.key != 'Critical').map((e) => Padding(
-                                  padding: const EdgeInsets.only(bottom: 4),
-                                  child: Row(
+                                    ],
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Row(
                                     children: [
-                                      SizedBox(
-                                        width: 52,
-                                        child: Text(
-                                          e.key.toUpperCase(),
+                                      Text(
+                                        _mlResult!.severity.toUpperCase(),
+                                        style: TextStyle(
+                                          fontFamily: 'Rajdhani',
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.w800,
+                                          color: _severityColor(_mlResult!.severity),
+                                          letterSpacing: 2,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Text(
+                                        '${_mlResult!.confidence.toStringAsFixed(1)}% CONFIDENCE',
+                                        style: const TextStyle(
+                                          fontFamily: 'IBMPlexMono',
+                                          fontSize: 9,
+                                          color: AppColors.textSecondary,
+                                          letterSpacing: 0.5,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 8),
+                                  ..._mlResult!.scores.entries.where((e) => e.key != 'Critical').map((e) => Padding(
+                                    padding: const EdgeInsets.only(bottom: 4),
+                                    child: Row(
+                                      children: [
+                                        SizedBox(
+                                          width: 52,
+                                          child: Text(
+                                            e.key.toUpperCase(),
+                                            style: const TextStyle(
+                                              fontFamily: 'IBMPlexMono',
+                                              fontSize: 8,
+                                              color: AppColors.textDim,
+                                              letterSpacing: 0.8,
+                                            ),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Stack(
+                                            children: [
+                                              Container(
+                                                height: 4,
+                                                decoration: BoxDecoration(
+                                                  color: AppColors.border,
+                                                  borderRadius: BorderRadius.circular(2),
+                                                ),
+                                              ),
+                                              FractionallySizedBox(
+                                                widthFactor: (e.value / 100).clamp(0, 1),
+                                                child: Container(
+                                                  height: 4,
+                                                  decoration: BoxDecoration(
+                                                    color: _severityColor(e.key),
+                                                    borderRadius: BorderRadius.circular(2),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          '${e.value.toStringAsFixed(0)}%',
                                           style: const TextStyle(
                                             fontFamily: 'IBMPlexMono',
                                             fontSize: 8,
                                             color: AppColors.textDim,
-                                            letterSpacing: 0.8,
                                           ),
                                         ),
-                                      ),
-                                      Expanded(
-                                        child: Stack(
-                                          children: [
-                                            Container(
-                                              height: 4,
-                                              decoration: BoxDecoration(
-                                                color: AppColors.border,
-                                                borderRadius: BorderRadius.circular(2),
-                                              ),
-                                            ),
-                                            FractionallySizedBox(
-                                              widthFactor: (e.value / 100).clamp(0, 1),
-                                              child: Container(
-                                                height: 4,
-                                                decoration: BoxDecoration(
-                                                  color: _severityColor(e.key),
-                                                  borderRadius: BorderRadius.circular(2),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      const SizedBox(width: 6),
-                                      Text(
-                                        '${e.value.toStringAsFixed(0)}%',
-                                        style: const TextStyle(
-                                          fontFamily: 'IBMPlexMono',
-                                          fontSize: 8,
-                                          color: AppColors.textDim,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                )),
-                              ],
+                                      ],
+                                    ),
+                                  )),
+                                ],
+                              ),
                             ),
-                          ),
+                          ],
                         ],
-                      ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 28),
+                    const SizedBox(height: 28),
 
-                  _animated(3, _SectionHeader('SEVERITY LEVEL')),
-                  const SizedBox(height: 4),
-                  _animated(
-                    3,
-                    Padding(
-                      padding: const EdgeInsets.only(left: 11, bottom: 14),
-                      child: Text(
-                        _mlResult != null
-                            ? 'ML has suggested a level. You may override below.'
-                            : 'Select the severity that best describes the situation.',
-                        style: const TextStyle(
-                          fontFamily: 'IBMPlexMono',
-                          fontSize: 10,
-                          color: AppColors.textDim,
-                          letterSpacing: 0.3,
+                    _animated(4, _SectionHeader('SEVERITY LEVEL')),
+                    const SizedBox(height: 4),
+                    _animated(
+                      4,
+                      Padding(
+                        padding: const EdgeInsets.only(left: 11, bottom: 14),
+                        child: Text(
+                          _mlResult != null
+                              ? 'ML has suggested a level. You may override below.'
+                              : 'Select the severity that best describes the situation.',
+                          style: const TextStyle(
+                            fontFamily: 'IBMPlexMono',
+                            fontSize: 10,
+                            color: AppColors.textDim,
+                            letterSpacing: 0.3,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  _animated(
-                    3,
-                    Column(
-                      children: _severityLevels.map((sev) {
-                        final selected = _selectedSeverity == sev;
-                        final color = _severityColor(sev);
-                        final isMlSuggested = _mlResult != null &&
-                            (_mlResult!.severity == sev ||
-                                (_mlResult!.severity == 'Critical' && sev == 'High'));
-                        return GestureDetector(
-                          onTap: () => setState(() {
-                            _selectedSeverity = sev;
-                            if (_mlResult != null && !isMlSuggested) {
-                              _mlOverridden = true;
-                            }
-                          }),
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 150),
-                            margin: const EdgeInsets.only(bottom: 8),
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                            decoration: BoxDecoration(
-                              color: selected ? color.withValues(alpha: 0.07) : AppColors.surface,
-                              borderRadius: BorderRadius.circular(4),
-                              border: Border.all(
-                                color: selected ? color : AppColors.border,
-                                width: selected ? 1.5 : 1,
-                              ),
-                            ),
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 36,
-                                  height: 36,
-                                  decoration: BoxDecoration(
-                                    color: color.withValues(alpha: 0.1),
-                                    borderRadius: BorderRadius.circular(3),
-                                    border: Border.all(color: color.withValues(alpha: 0.3)),
-                                  ),
-                                  child: Icon(_severityIcon(sev), color: color, size: 16),
+                    _animated(
+                      4,
+                      Column(
+                        children: _severityLevels.map((sev) {
+                          final selected = _selectedSeverity == sev;
+                          final color = _severityColor(sev);
+                          final isMlSuggested = _mlResult != null &&
+                              (_mlResult!.severity == sev ||
+                                  (_mlResult!.severity == 'Critical' && sev == 'High'));
+                          return GestureDetector(
+                            onTap: () => setState(() {
+                              _selectedSeverity = sev;
+                              if (_mlResult != null && !isMlSuggested) {
+                                _mlOverridden = true;
+                              }
+                            }),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 150),
+                              margin: const EdgeInsets.only(bottom: 8),
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                              decoration: BoxDecoration(
+                                color: selected ? color.withValues(alpha: 0.07) : AppColors.surface,
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(
+                                  color: selected ? color : AppColors.border,
+                                  width: selected ? 1.5 : 1,
                                 ),
-                                const SizedBox(width: 14),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Text(
-                                            sev.toUpperCase(),
-                                            style: TextStyle(
-                                              fontFamily: 'Rajdhani',
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w700,
-                                              color: selected ? color : AppColors.textPrimary,
-                                              letterSpacing: 2,
-                                            ),
-                                          ),
-                                          if (isMlSuggested) ...[
-                                            const SizedBox(width: 6),
-                                            Container(
-                                              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                                              decoration: BoxDecoration(
-                                                color: AppColors.electric.withValues(alpha: 0.12),
-                                                borderRadius: BorderRadius.circular(2),
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 36,
+                                    height: 36,
+                                    decoration: BoxDecoration(
+                                      color: color.withValues(alpha: 0.1),
+                                      borderRadius: BorderRadius.circular(3),
+                                      border: Border.all(color: color.withValues(alpha: 0.3)),
+                                    ),
+                                    child: Icon(_severityIcon(sev), color: color, size: 16),
+                                  ),
+                                  const SizedBox(width: 14),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Text(
+                                              sev.toUpperCase(),
+                                              style: TextStyle(
+                                                fontFamily: 'Rajdhani',
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w700,
+                                                color: selected ? color : AppColors.textPrimary,
+                                                letterSpacing: 2,
                                               ),
-                                              child: const Text(
-                                                'ML',
-                                                style: TextStyle(
-                                                  fontFamily: 'IBMPlexMono',
-                                                  fontSize: 7,
-                                                  color: AppColors.electric,
-                                                  letterSpacing: 1,
+                                            ),
+                                            if (isMlSuggested) ...[
+                                              const SizedBox(width: 6),
+                                              Container(
+                                                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                                                decoration: BoxDecoration(
+                                                  color: AppColors.electric.withValues(alpha: 0.12),
+                                                  borderRadius: BorderRadius.circular(2),
+                                                ),
+                                                child: const Text(
+                                                  'ML',
+                                                  style: TextStyle(
+                                                    fontFamily: 'IBMPlexMono',
+                                                    fontSize: 7,
+                                                    color: AppColors.electric,
+                                                    letterSpacing: 1,
+                                                  ),
                                                 ),
                                               ),
-                                            ),
+                                            ],
                                           ],
-                                        ],
-                                      ),
-                                      Text(
-                                        _severityDescriptions[sev]!,
-                                        style: const TextStyle(
-                                          fontFamily: 'IBMPlexMono',
-                                          fontSize: 9,
-                                          color: AppColors.textDim,
-                                          height: 1.5,
-                                          letterSpacing: 0.3,
                                         ),
-                                      ),
-                                    ],
+                                        Text(
+                                          _severityDescriptions[sev]!,
+                                          style: const TextStyle(
+                                            fontFamily: 'IBMPlexMono',
+                                            fontSize: 9,
+                                            color: AppColors.textDim,
+                                            height: 1.5,
+                                            letterSpacing: 0.3,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                if (selected) Icon(Icons.check_rounded, color: color, size: 16),
-                              ],
+                                  if (selected) Icon(Icons.check_rounded, color: color, size: 16),
+                                ],
+                              ),
                             ),
-                          ),
-                        );
-                      }).toList(),
+                          );
+                        }).toList(),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 28),
+                    const SizedBox(height: 28),
+                  ],
 
-                  _animated(4, _SectionHeader('LOCATION')),
+                  _animated(5, _SectionHeader('LOCATION')),
                   const SizedBox(height: 14),
                   _animated(
-                    4,
+                    5,
                     _pinnedLat != null
                         ? Container(
                             padding: const EdgeInsets.all(12),
@@ -1180,7 +1295,7 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                   ),
                   const SizedBox(height: 10),
                   _animated(
-                    4,
+                    5,
                     _TacticalTextField(
                       controller: _locationCtrl,
                       label: _pinnedLat != null ? 'LOCATION DESCRIPTION (OPTIONAL)' : 'LOCATION DESCRIPTION',
@@ -1198,46 +1313,6 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                     ),
                   ),
                   const SizedBox(height: 28),
-
-                  _animated(
-                    5,
-                    Container(
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color: AppColors.blue.withValues(alpha: 0.06),
-                        borderRadius: BorderRadius.circular(4),
-                        border: Border.all(color: AppColors.blue.withValues(alpha: 0.2)),
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            width: 28,
-                            height: 28,
-                            decoration: BoxDecoration(
-                              color: AppColors.blue.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(3),
-                            ),
-                            child: const Icon(Icons.info_outline_rounded, color: AppColors.blue, size: 14),
-                          ),
-                          const SizedBox(width: 12),
-                          const Expanded(
-                            child: Text(
-                              'ML triage auto-suggests severity based on your description. You may override the suggestion before submitting.',
-                              style: TextStyle(
-                                fontFamily: 'IBMPlexMono',
-                                fontSize: 10,
-                                color: AppColors.blue,
-                                height: 1.6,
-                                letterSpacing: 0.3,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
 
                   _animated(
                     6,
@@ -1260,7 +1335,7 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                               ),
                             )
                           : _TacticalButton(
-                              label: 'TRANSMIT REPORT',
+                              label: _isMinorConcern ? 'SUBMIT CONCERN' : 'TRANSMIT REPORT',
                               icon: Icons.send_rounded,
                               onPressed: _submit,
                               primary: true,
@@ -1276,6 +1351,91 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
       ),
     );
   }
+}
+
+// ─── Custom Widgets ─────────────────────────────────────────────────────────
+
+// NEW: Segmented Tab for the Report Type
+class _TacticalTab extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final bool isActive;
+  final VoidCallback onTap;
+
+  const _TacticalTab({
+    required this.label,
+    required this.icon,
+    required this.isActive,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: isActive ? AppColors.electric.withValues(alpha: 0.15) : Colors.transparent,
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon, 
+              size: 14, 
+              color: isActive ? AppColors.electric : AppColors.textDim
+            ),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                fontFamily: 'Rajdhani',
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: isActive ? AppColors.electric : AppColors.textDim,
+                letterSpacing: 1.5,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// NEW: Dashed Border for Image Upload
+class _DashedBorderPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = AppColors.border
+      ..strokeWidth = 2
+      ..style = PaintingStyle.stroke;
+      
+    final path = Path()
+      ..addRRect(RRect.fromRectAndRadius(Rect.fromLTWH(0, 0, size.width, size.height), const Radius.circular(6)));
+
+    // Create dash effect
+    const dashWidth = 6.0;
+    const dashSpace = 4.0;
+    double distance = 0.0;
+    for (ui.PathMetric pathMetric in path.computeMetrics()) {
+      while (distance < pathMetric.length) {
+        canvas.drawPath(
+          pathMetric.extractPath(distance, distance + dashWidth),
+          paint,
+        );
+        distance += dashWidth + dashSpace;
+      }
+      distance = 0.0;
+    }
+  }
+
+  @override
+  bool shouldRepaint(_) => false;
 }
 
 class _SectionHeader extends StatelessWidget {

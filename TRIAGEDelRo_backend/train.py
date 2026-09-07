@@ -23,6 +23,7 @@ from transformers import (
     Trainer,
     TrainingArguments,
 )
+from transformers.trainer_utils import get_last_checkpoint
 from torch.utils.data import Dataset
 
 # ─── CONFIG ──────────────────────────────────────────────────────────────────
@@ -145,8 +146,17 @@ def train(df):
 
     trainer = Trainer(model=model, args=args, train_dataset=train_ds, eval_dataset=test_ds)
 
+    # Auto-resume: if a previous run left checkpoints in MODEL_OUTPUT (e.g. the
+    # process got interrupted), pick up from the latest one instead of
+    # restarting from scratch.
+    last_checkpoint = None
+    if os.path.isdir(MODEL_OUTPUT):
+        last_checkpoint = get_last_checkpoint(MODEL_OUTPUT)
+        if last_checkpoint:
+            print(f"\nFound existing checkpoint, resuming from: {last_checkpoint}")
+
     print("\nTraining started... (takes 10-30 mins depending on your PC)")
-    trainer.train()
+    trainer.train(resume_from_checkpoint=last_checkpoint)
 
     preds = trainer.predict(test_ds)
     y_pred = np.argmax(preds.predictions, axis=1)

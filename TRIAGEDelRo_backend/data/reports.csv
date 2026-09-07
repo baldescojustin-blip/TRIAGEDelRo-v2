@@ -1,41 +1,699 @@
-report_text,category,severity
-Nagbaha na sa aming bahay lahat nalubog ang gamit,Flooding,High
-May nakulong na tao sa loob ng bahay hindi makalabas dahil sa baha,Flooding,High
-Nahulog ang puno sa gitna ng kalsada hindi madaraanan,Road Hazard,Medium
-May nasugatan sa aming kapitbahay kailangan ng tulong,Medical,High
-Bumagsak ang poste ng kuryente sa harap ng aming bahay,Power Hazard,High
-Maliit lang ang baha pero lumalaki na,Flooding,Low
-Nagreklamo ang mga residente dahil walang tubig,Utility,Low
-May sunog sa bahay ng kapitbahay namin tulong naman,Fire,High
-Maraming basura sa estero nagdudulot ng baha,Flooding,Medium
-May taong nahimatay sa kalsada kailangan ng ambulansya,Medical,High
-Lumubog na ang aming sasakyan sa baha,Flooding,High
-Naputol ang tubo ng tubig sa aming sityo,Utility,Medium
-May lumagpak na kisame sa loob ng bahay walang nasugatan,Structural,Medium
-Ang aming purok ay walang kuryente mula kahapon,Power Hazard,Medium
-May bata na naipit sa lupa pagkatapos ng pagguho,Landslide,High
-Ang daan papunta sa barangay ay hindi na madaraanan,Road Hazard,High
-May namatay na alagang hayop sa baha,Flooding,Low
-Nahulog ang matanda sa bangin kailangan ng tulong,Medical,High
-Ang bahay ng aming kapitbahay ay gumuho na,Structural,High
-Mabaho ang tubig na lumalabas sa aming gripo,Utility,Medium
-May labanan sa aming sityo may sugatan,Security,High
-Huminto na ang malaking sasakyan sa gitna ng daan,Road Hazard,Low
-May babaeng nanganganak kailangan ng ambulansya agad,Medical,High
-Nasira ang tulay dahil sa malakas na agos ng tubig,Infrastructure,High
-Walang makain ang aming pamilya mula kahapon,Food,High
-Nag-overflow na ang ilog malapit sa aming barangay,Flooding,High
-May sumakit na ang tiyan ng maraming bata sa aming sityo,Medical,Medium
-Lumabas na ang ahas sa aming bakuran,Animal,Low
-May gumuho na bahagi ng bundok malapit sa amin,Landslide,High
-Ang aming kalsada ay may malaking butas mapanganib sa sasakyan,Road Hazard,Medium
-Trapped ang pamilya sa rooftop dahil sa baha kailangan ng rescue agad,Flooding,High
-Nasakal ang bata hindi humihinga kailangan ng tulong,Medical,High
-Bumagsak ang billboard malapit sa paaralan,Infrastructure,High
-Nag-landslide sa itaas ng bundok papunta sa aming barangay,Landslide,High
-May tao na hindi umuubra ang dibdib nasa ilog,Medical,High
-Lubog na ang halos lahat ng bahay sa aming sityo,Flooding,High
-Nawala ang aming bata hindi namin mahanap,Security,High
-Hindi makaalis ang mga matatanda sa kanilang bahay dahil sa baha,Flooding,High
-Sumabog ang LPG tank sa aming kapitbahay,Fire,High
-Mababa lang ang tubig ngayon pero lalong tumataas,Flooding,Medium
+report_text,category,severity,language
+Nag aalala po kami dahil Nasusunog ang tindahan may mga taong naiipit sa loob,Fire,High,tagalog
+Ang mga alagang aso ng kapitbahay ay palaging umaatake sa mga dumaan sana ay tulungan ninyo kami.,Animal,Medium,tagalog
+"Mahal na barangay tanggapan, May bitak sa plasa ng barangay maliit lang naman pero gusto ko lang ireport pakiusap.",Structural,Low,tagalog
+Ang LPG tank ay naputok at nagdulot ng sunog sa paligid kailangan na talaga ng tulong.,Fire,High,tagalog
+"Importante po ito, Malaking landslide sa kabundukan naiipit ang ilang pamilya sa ibaba",Landslide,High,tagalog
+Alam ko po na marami kayong trabaho pero Maraming butas sa daan sa aming sityo kailangan ng ayos salamat po.,Road Hazard,Medium,tagalog
+"Pakiusap sana ay tulungan kami, Nalaglag ang overpass bridge component sa kalsada delikado sa mga sasakyan salamat po.",Road Hazard,High,tagalog
+Walang tubig kami tuwing umaga dapat ay may tubig maaari ba kayong tumulong?,Utility,Medium,tagalog
+Nag aalala po kami dahil Bumagsak ang lupa mula sa mataas na bahagi patungo sa mga bahay sa ilalim pakiusap.,Landslide,High,tagalog
+Naputol ang high tension wire at bumagsak sa palengke,Power Hazard,High,tagalog
+"Natumba an dakulang parte kan tulay sa samuyang lugar, peligroso",Infrastructure,High,bikol
+"Pakiusap sana ay tulungan kami, May pagguho ng lupa sa estero naharang na ang daloy ng tubig umaasa po kaming maaksyunan ito.",Landslide,High,tagalog
+"Importante po ito, Ang kalsada sa aming barangay ay lubak lubak na mapanganib sa motorsiklo nangyari ito kanina pa.",Road Hazard,Medium,tagalog
+May matanda na hirap huminga sinasabing masakit ang dibdib niya,Medical,High,tagalog
+Daing tubig na maiinom sa samuyang lugar sa tulong aldaw na ini kaipuhan na gayod nin tabang.,Utility,High,bikol
+"Aram ko na dakul kamong trabaho pero May naheling na aso sa dumpsite, tibaad may nagkakalayo na basura",Fire,Medium,bikol
+Ang overpass ay may malaking bitak at delikado na sa mga gumagamit umaasa po kaming maaksyunan ito.,Infrastructure,High,tagalog
+"Nagbaha na sa samuyang harong, gabos na gamit nalubugan na",Flooding,High,bikol
+"Aram ko na dakul kamong trabaho pero May naheling kaming mga gapo sa kalsada, tibaad hali sa bukid kaipuhan nin tulong ngunyan.",Landslide,Low,bikol
+"Nag-aalala kami huli ta Naputol an pangenot na tubo nin tubig, gabos kami daing tubig kaipuhan na gayod nin tabang.",Utility,High,bikol
+Ang ilaw sa aming sityo ay kumukurap na baka may problema sa linya nangyari ito kanina pa.,Power Hazard,Low,tagalog
+Nag aalala po kami dahil May konting spark sa lumang socket sa aming barangay hall kailangan ng agad na aksyon.,Power Hazard,Low,tagalog
+"Pakiusap tabangan kami, Dakul na adik an naheheling sa samuyang lugar kada banggi, kaipuhan aksyon salamat.",Security,Medium,bikol
+"Nagtatanong po kung may aksyon na, May pagguho ng lupa sa taas ng bundok naharang ang daan pababa nangyari ito kanina pa.",Landslide,High,tagalog
+"Nagtatanong po kung may aksyon na, Naputol ang gas line malapit sa mga bahay mapanganib sa pagsabog",Utility,High,tagalog
+May live wire na nahulog sa kalsada mapanganib sa lahat maraming salamat po.,Power Hazard,High,tagalog
+"Pakiusap sana ay tulungan kami, Maraming residente ang hindi kumakain dahil sa tagtuyot wala silang pagkain maraming salamat po.",Food,Medium,tagalog
+Gusto ko lang ireport na Nasira ang tulay dahil sa lakas ng baha hindi na madaraanan kailangan ng agad na aksyon.,Flooding,High,tagalog
+Nag aalala po kami dahil Ang street light sa aming lugar ay naputulan ng ilaw gusto ko lang ireport umaasa po kaming maaksyunan ito.,Utility,Low,tagalog
+"Nagtatanong po kung may aksyon na, Nalaglag ang overpass bridge component sa kalsada delikado sa mga sasakyan kailangan na talaga ng tulong.",Road Hazard,High,tagalog
+Naaksidente ang aking kapitbahay kailangan ng agad na tulong medikal nangyari ito kanina pa.,Medical,High,tagalog
+"Aram ko na dakul kamong trabaho pero An wiring kan sarong harong daan na, tibaad magkorto-sirkito kaipuhan nin tulong ngunyan.",Power Hazard,Medium,bikol
+May bata na binugbog kailangan ng medical attention agad maraming salamat po.,Medical,High,tagalog
+"Nagtatanong po kung may aksyon na, Gusto ko lang ireport na maraming lamok sa aming lugar",Medical,Low,tagalog
+Alam ko po na marami kayong trabaho pero Malaking sunog sa lumber yard apoy papalaki na nangyari ito kanina pa.,Fire,High,tagalog
+Gusto ko lang ireport na Nakita ko ang isang suspetsa na taong nagtatago sa likod ng building,Security,High,tagalog
+"Naghahapot ako kun igwa nang aksyon, Dakulang sunog sa palengke, nagdadakula pa an kalayo, kaipuhan nin tabang kaipuhan na gayod nin tabang.",Fire,High,bikol
+"Mahal na barangay tanggapan, Kailangan ng food assistance ang maraming pamilya sa aming barangay kailangan na talaga ng tulong.",Food,Medium,tagalog
+Naghihilaw an salog asin nag-aalsa na sa mga harong sa gilid tabangan niyo kami tabi.,Flooding,High,bikol
+Gusto ko lang ireport na Kailangan ng vitamins ang mga bata sa aming purok maraming salamat po.,Medical,Low,tagalog
+"Pakiusap sana ay tulungan kami, Apoy na lumabas sa transformer nagdulot ng sunog sa tabi nitong bahay",Fire,High,tagalog
+"Mahal na barangay tanggapan, Mataas na ang tubig sa aming lugar halos hanggang dibdib na salamat po.",Flooding,High,tagalog
+Walang kuryente ngayon kaya nagrereport lang kung may nangyari maraming salamat po.,Utility,Low,tagalog
+"Importante ini, Nahulog an daga hali sa gilid kan kalsada, nakaharang na an dalan",Road Hazard,High,bikol
+"Pakiusap tabangan kami, An pinto kan sityo hall sira na, masakit buksan salamat.",Structural,Low,bikol
+Gusto ko sanang i-report na Daing tubig na maiinom sa samuyang lugar sa tulong aldaw na ini ini nangyari ngunyan.,Utility,High,bikol
+May nagtatambay sa atubangan kan samuyang harong kada banggi kaipuhan nin tulong ngunyan.,Security,Low,bikol
+Ang mga linya ay magkadikit na sa kalye mapanganib sa mga motorsiklo kailangan na talaga ng tulong.,Power Hazard,Medium,tagalog
+"Pakiusap sana ay tulungan kami, Kailangan ng vitamins ang mga bata sa aming purok kailangan ng agad na aksyon.",Medical,Low,tagalog
+Gusto ko lang ireport na Nasusunog ang tindahan may mga taong naiipit sa loob salamat po.,Fire,High,tagalog
+May konting spark sa lumang socket sa aming barangay hall sana ay tulungan ninyo kami.,Power Hazard,Low,tagalog
+Ang matanda sa kanto ay may matagal nang sugat na hindi gumagaling,Medical,Medium,tagalog
+"Aram ko na dakul kamong trabaho pero Naheling ko an sarong tawong may hawak na lading, nagbabanta sa mga tawo dakul na salamat.",Security,High,bikol
+Gusto ko lang ireport na Ang baha ay umabot na sa bubungan ng mababang bahay dito sa amin,Flooding,High,tagalog
+Gusto ko lang ireport na Ang drainage dito sa amin ay puno na ng basura kaya nagbabaha maraming salamat po.,Flooding,Medium,tagalog
+"Aram ko na dakul kamong trabaho pero Nahulog an transformer harani sa palengke, may kalayong naluluwas naglalaom kami na maaksyunan ini.",Power Hazard,High,bikol
+"Naghahapot ako kun igwa nang aksyon, Natumba an atop kan alang na gusali, may naipit na tawo sa laog tabangan niyo kami tabi.",Structural,High,bikol
+"Importante po ito, May maliit na sunog sa vegetable stall nabugaw na pero may natitira nangyari ito kanina pa.",Fire,Medium,tagalog
+Nag aalala po kami dahil Ang water pressure sa aming lugar ay napakababa halos walang tubig pakiusap.,Utility,Medium,tagalog
+"Pakiusap tabangan kami, May nangagaw nin bag sa samuyang lugar, dakul na beses na ining nangyari tabangan niyo kami tabi.",Security,High,bikol
+Alam ko po na marami kayong trabaho pero Nagsimula ng bumaha sa mababang lugar ng barangay nangyari ito kanina pa.,Flooding,Medium,tagalog
+Gusto ko lang ireport na Ang retaining wall sa aming lugar ay gumuho na kailangan ng ayos,Structural,High,tagalog
+"Nag-aalala kami huli ta Apat na harong an nasunog sa samuyang sityo, kaipuhan nin rescue puwede daw kamong tumabang?",Fire,High,bikol
+"Nagtatanong po kung may aksyon na, Naaksidente ang aking kapitbahay kailangan ng agad na tulong medikal maraming salamat po.",Medical,High,tagalog
+"Aram ko na dakul kamong trabaho pero Naaksidente an sakuyang kataed, kaipuhan nin dagos na tabang medikal pakiusap.",Medical,High,bikol
+"May aking binugbog, kaipuhan nin atensyon medikal ngunyan man salamat.",Medical,High,bikol
+"Importante po ito, Ang aspalto sa harap ng eskwelahan ay biglang lumubog may malaking hukay kailangan na talaga ng tulong.",Road Hazard,High,tagalog
+"Pakiusap sana ay tulungan kami, Nagtayo na ng emergency shelter pero may naiwan pang tao sa baha salamat po.",Flooding,High,tagalog
+Alam ko po na marami kayong trabaho pero Nasunog ang kamay ng bata habang naglalaro malapit sa kalan kailangan ng tulong maraming salamat po.,Medical,High,tagalog
+"Aram ko na dakul kamong trabaho pero Natumba an retaining wall kan kalsada sa bukid, naipit an mga sasakyan dakul na salamat.",Infrastructure,High,bikol
+Gusto ko lang ireport na Ang wiring sa isang bahay ay luma na at baka magkorslot pakiusap.,Power Hazard,Medium,tagalog
+Maliit lang ang baha pero lumalaki na kailangan bantayan,Flooding,Medium,tagalog
+"Pakiusap sana ay tulungan kami, May malalaking bato sa kalsada pagkatapos ng ulan delikado sa gabi kailangan na talaga ng tulong.",Road Hazard,Medium,tagalog
+"Mahal na barangay tanggapan, Gusto ko lang ireport na maraming lamok sa aming lugar pakiusap.",Medical,Low,tagalog
+Ang mga pagkain sa canteen ay hindi maayos na nakaimbak posibleng masama,Food,Medium,tagalog
+"Dakul na ayam na daing kagsadiri sa samuyang lugar, delikado sa mga aki",Animal,Medium,bikol
+"May nag-iiriwal-wal asin naggagamit nin armas sa palengke, kaipuhan tulos nin pulis",Security,High,bikol
+"Naghahapot ako kun igwa nang aksyon, Naputol an pangenot na tubo nin tubig, gabos kami daing tubig ini nangyari ngunyan.",Utility,High,bikol
+Gusto ko lang ireport na May buntis na manganganak na kailangan ng agad na sasakyan papunta ospital maaari ba kayong tumulong?,Medical,High,tagalog
+"Importante po ito, May pagguho ng lupa sa estero naharang na ang daloy ng tubig salamat po.",Landslide,High,tagalog
+Nag aalala po kami dahil Hindi gumagana ang traffic light sa intersection mapanganib,Road Hazard,Medium,tagalog
+Bukas na ang manhole cover sa gitna ng daan nakita ko na ang ilang nadaanan umaasa po kaming maaksyunan ito.,Road Hazard,High,tagalog
+Nag-aalala kami huli ta May food poisoning na naeksperyensya kan dakul na residente hali sa sarong tindahan dakul na salamat.,Food,High,bikol
+Naputol ang linya ng kuryente nahulog sa may basang daan mapanganib,Utility,High,tagalog
+Nag aalala po kami dahil Maraming bata ang may lagnat at ubo sa aming purok salamat po.,Medical,Medium,tagalog
+"Importante ini, Nagaba an pangenot na kalsada, dai na madadaanan kan mga sasakyan salamat.",Infrastructure,High,bikol
+Nag aalala po kami dahil Konting tubig sa labas ng bahay wala naman malaking epekto nangyari ito kanina pa.,Flooding,Low,tagalog
+Gusto ko lang ireport na May nakita kaming bitak sa lupa sa mataas na lugar posibleng magguho maaari ba kayong tumulong?,Landslide,Medium,tagalog
+Umabot na ang baha sa loob ng classroom at opisina ng barangay maaari ba kayong tumulong?,Flooding,High,tagalog
+Dalawang bahay na naanod sa baha kailangan agad ng tulong,Flooding,High,tagalog
+Aram ko na dakul kamong trabaho pero Daing tubig na maiinom sa samuyang lugar sa tulong aldaw na ini dakul na salamat.,Utility,High,bikol
+"Importante po ito, Ang lumang gusali ay gumuho na sa isang parte kailangan ng rescue",Structural,High,tagalog
+Gusto ko lang ireport na Ang mga residente ay lumikas na pero may natira pang matatanda kailangan ng agad na aksyon.,Flooding,High,tagalog
+"Mahal na tanggapan kan barangay, An gilid kan kalsada sa bukid naluluwag na, tibaad maggaba tabangan niyo kami tabi.",Landslide,Medium,bikol
+Alam ko po na marami kayong trabaho pero Ang estero sa amin ay lagi nang umaapaw kapag umuulan,Flooding,Medium,tagalog
+Aram ko na dakul kamong trabaho pero Naghihilaw an baha sa mababang parte kan barangay,Flooding,Medium,bikol
+"Naghahapot ako kun igwa nang aksyon, An pinto kan sityo hall sira na, masakit buksan dakul na salamat.",Structural,Low,bikol
+"Importante po ito, Naputol ang main water pipe lahat kami walang tubig umaasa po kaming maaksyunan ito.",Utility,High,tagalog
+Hindi gumagana ang traffic light sa intersection mapanganib nangyari ito kanina pa.,Road Hazard,Medium,tagalog
+"Mahal na barangay tanggapan, Nasunog ang apat na bahay sa aming sityo kailangan ng rescue",Fire,High,tagalog
+"Importante po ito, Ang tubig na ininom ng mga bata ay may kakaibang amoy posibleng kontaminado salamat po.",Food,High,tagalog
+Apoy na lumabas sa transformer nagdulot ng sunog sa tabi nitong bahay nangyari ito kanina pa.,Fire,High,tagalog
+"Mahal na tanggapan kan barangay, May konting tubig sa gilid kan tulay huli sa uran kaipuhan na gayod nin tabang.",Flooding,Low,bikol
+Malaking landslide sa kabundukan naiipit ang ilang pamilya sa ibaba maaari ba kayong tumulong?,Landslide,High,tagalog
+"Nagtatanong po kung may aksyon na, Lumagpas na ang baha sa baywang antas kailangan na ng pagtulong nangyari ito kanina pa.",Flooding,High,tagalog
+May nag-aaway at gumagamit ng armas sa palengke kailangan ng pulis agad maaari ba kayong tumulong?,Security,High,tagalog
+Maliit lang ang baha pero lumalaki na kailangan bantayan ito ay nangyari ngayon.,Flooding,Medium,tagalog
+Gusto ko lang ireport na May nagrereklamo ng sakit ng ulo sa init ng panahon ngayon pakiusap.,Medical,Low,tagalog
+"Nagtatanong po kung may aksyon na, May napansing usok sa dumpsite baka sumasamang basura kailangan ng agad na aksyon.",Fire,Medium,tagalog
+"Mahal na barangay tanggapan, Maliit na baha sa ilalim ng tulay gusto lang malaman ng barangay",Flooding,Low,tagalog
+Gusto ko lang ireport na Ang drainage sa aming lugar ay sira na palagi kaming nababaha salamat po.,Utility,Medium,tagalog
+Nag aalala po kami dahil May pinaghihinalaang drug den sa katabing bahay kailangan ng imbestigasyon maraming salamat po.,Security,Medium,tagalog
+Gusto ko lang ireport na Nabasa lang ang kalsada sa harap hindi naman malubha pakiusap.,Flooding,Low,tagalog
+"Pakiusap sana ay tulungan kami, May bata na nalunod sa mababaw na tubig kailangan agad ng medikal nangyari ito kanina pa.",Medical,High,tagalog
+"Importante ini, Dakul na residente an naghehelang, tibaad dengue, kaipuhan nin fumigation dakul na salamat.",Medical,Medium,bikol
+Gusto ko lang ireport na Nagsisimulang gumuhit ang lupa sa bundok sa aming lugar babantayan,Landslide,Medium,tagalog
+May bitak sa plasa ng barangay maliit lang naman pero gusto ko lang ireport maraming salamat po.,Structural,Low,tagalog
+May konting tubig sa gilid kan tulay huli sa uran tabangan niyo kami tabi.,Flooding,Low,bikol
+"Mahal na barangay tanggapan, Ang landslide ay sumakop sa dalawang bahay kailangan ng rescue agad",Landslide,High,tagalog
+Gusto ko lang ireport na Nasunog ang apat na bahay sa aming sityo kailangan ng rescue ito ay nangyari ngayon.,Fire,High,tagalog
+"Pakiusap sana ay tulungan kami, Ang mga baboy na gala sa kalsada ay nagdudulot ng panganib sa mga sasakyan ito ay nangyari ngayon.",Animal,Medium,tagalog
+"Nagtatanong po kung may aksyon na, Gusto ko lang ireport na ang aming poste ay medyo lumang lumuma na",Power Hazard,Low,tagalog
+"Importante po ito, Bumagsak ang malaking bato mula sa bundok naharang ang daan maaari ba kayong tumulong?",Road Hazard,High,tagalog
+"Aram ko na dakul kamong trabaho pero Kinagat kan ayam an sarong aki na yaon sa dalan, kaipuhan nin tabang medikal naglalaom kami na maaksyunan ini.",Animal,High,bikol
+"Nagtatanong po kung may aksyon na, Ang mga linya ng kuryente sa aming lugar ay masyadong mababa delikado maraming salamat po.",Power Hazard,Medium,tagalog
+Alam ko po na marami kayong trabaho pero May taong nahimatay sa kalsada kailangan ng ambulansya,Medical,High,tagalog
+Dakul na residente an dai nakakakaon huli sa kadaihan nin pagkaon,Food,Medium,bikol
+Ang inuming tubig ng barangay ay may amoy na hindi normal kailangan suriin sana ay tulungan ninyo kami.,Food,High,tagalog
+"Naghahapot ako kun igwa nang aksyon, May electric shock an sarong aki sa atubangan kan samuyang harong ini nangyari ngunyan.",Power Hazard,High,bikol
+Mababaw ang baha pero lumalamig na ang temperatura pwede pa lumaki nangyari ito kanina pa.,Flooding,Medium,tagalog
+Alam ko po na marami kayong trabaho pero May suspetsa na dengue outbreak sa aming barangay maraming nagrereklamo pakiusap.,Medical,Medium,tagalog
+"Kinagat kan ayam an sarong aki na yaon sa dalan, kaipuhan nin tabang medikal salamat.",Animal,High,bikol
+May nakulong na tao sa loob ng bahay hindi makalabas dahil sa baha,Flooding,High,tagalog
+"Mahal na barangay tanggapan, May nang-aagaw ng bag sa aming lugar maraming beses nang nangyari nangyari ito kanina pa.",Security,High,tagalog
+Gusto ko sanang i-report na May konting tubig sa gilid kan tulay huli sa uran,Flooding,Low,bikol
+"Nagtatanong po kung may aksyon na, Ang estero sa amin ay lagi nang umaapaw kapag umuulan ito ay nangyari ngayon.",Flooding,Medium,tagalog
+Nag aalala po kami dahil Nahulog ang malaking sanga ng puno sa kalsada naputol ang linya ng kuryente sana ay tulungan ninyo kami.,Road Hazard,High,tagalog
+Ang aming sityo ay kulang sa ilaw sa gabi posibleng hindi ligtas salamat po.,Security,Low,tagalog
+"Mahal na barangay tanggapan, Naputol ang linya ng kuryente nahulog sa may basang daan mapanganib salamat po.",Utility,High,tagalog
+Ang matanda sa kanto ay may matagal nang sugat na hindi gumagaling,Medical,Medium,tagalog
+Alam ko po na marami kayong trabaho pero Naputol ang daliri ng isang bata sa aksidente kailangan ng ospital ito ay nangyari ngayon.,Medical,High,tagalog
+Alam ko po na marami kayong trabaho pero Konting tubig sa labas ng bahay wala naman malaking epekto kailangan ng agad na aksyon.,Flooding,Low,tagalog
+"Mahal na barangay tanggapan, Maliliit na butas sa kalsada gusto ko lang ireport para maayos sana ay tulungan ninyo kami.",Road Hazard,Low,tagalog
+"Aram ko na dakul kamong trabaho pero Naghali sa kalan an sunog, luway-luway nag-aabot sa ibang harong salamat.",Fire,High,bikol
+"Importante ini, May nasakitan sa samuyang kataed, kaipuhan tulos nin tabang dakul na salamat.",Medical,High,bikol
+Ang landslide ay sumakop sa dalawang bahay kailangan ng rescue agad maaari ba kayong tumulong?,Landslide,High,tagalog
+Aram ko na dakul kamong trabaho pero Kaipuhan nin bitamina an mga aki sa samuyang purok salamat.,Medical,Low,bikol
+"Mahal na barangay tanggapan, Bumagsak ang malaking bato mula sa bundok naharang ang daan maaari ba kayong tumulong?",Road Hazard,High,tagalog
+Gusto ko lang ireport na Ang kalsada sa aming barangay ay lubak lubak na mapanganib sa motorsiklo nangyari ito kanina pa.,Road Hazard,Medium,tagalog
+Alam ko po na marami kayong trabaho pero Biglang bumaha ang kanal umabot na ang tubig sa loob ng bahay namin kailangan ng agad na aksyon.,Flooding,High,tagalog
+Lagi na kaming walang kuryente sa gabi pumunta na kami sa barangay hall sana ay tulungan ninyo kami.,Utility,Medium,tagalog
+Nag aalala po kami dahil Ang street light sa aming lugar ay naputulan ng ilaw gusto ko lang ireport,Utility,Low,tagalog
+Nag aalala po kami dahil Gusto ko lang ireport na may mga estranyo na nakikita sa aming lugar pakiusap.,Security,Low,tagalog
+"Pakiusap sana ay tulungan kami, Sira na ang street light sa aming kalsada mapanganib sa gabi kailangan na talaga ng tulong.",Utility,Medium,tagalog
+Konting tubig sa labas ng bahay wala naman malaking epekto maaari ba kayong tumulong?,Flooding,Low,tagalog
+"Nagtatanong po kung may aksyon na, May nahulog na container van sa kalsada delikado sa mga sasakyan kailangan na talaga ng tulong.",Road Hazard,High,tagalog
+Gusto ko lang ireport na Ang bakod ng parke sa amin ay may sira na dapat na ayusin,Structural,Low,tagalog
+"Importante po ito, Lumagpas na ang baha sa baywang antas kailangan na ng pagtulong maraming salamat po.",Flooding,High,tagalog
+"Importante po ito, Nagsimula sa kalan ang sunog mabilis na kumalat sa ibang bahay sana ay tulungan ninyo kami.",Fire,High,tagalog
+Malaking landslide sa kabundukan naiipit ang ilang pamilya sa ibaba,Landslide,High,tagalog
+"Pakiusap sana ay tulungan kami, May bitak sa plasa ng barangay maliit lang naman pero gusto ko lang ireport",Structural,Low,tagalog
+Alam ko po na marami kayong trabaho pero Maraming nahulog na bato mula sa taas ngayong tag-ulan kailangan bantayan kailangan ng agad na aksyon.,Landslide,Medium,tagalog
+Ang kalsada sa aming sityo ay lubak lubak na at sira ang drainage sana ay tulungan ninyo kami.,Infrastructure,Medium,tagalog
+"Pakiusap sana ay tulungan kami, Nahulog ang kaunting lupa sa drainage gusto ko lang ireport nangyari ito kanina pa.",Landslide,Low,tagalog
+"Importante ini, Gaba na an speed bump sa atubangan kan eskwelahan, peligroso sa mga aki puwede daw kamong tumabang?",Road Hazard,Medium,bikol
+Ang ilaw sa aming sityo ay kumukurap na baka may problema sa linya,Power Hazard,Low,tagalog
+Nag aalala po kami dahil Ang tulay ay may malaking butas na sa gitna delikado sa mga bata maraming salamat po.,Infrastructure,Medium,tagalog
+"Aram ko na dakul kamong trabaho pero Nahulog an signage sa kanto, kaipuhan nin kapalit dakul na salamat.",Road Hazard,Low,bikol
+Biglang bumagsak ang malaking bahagi ng bundok malapit sa mga bahay,Landslide,High,tagalog
+"Importante po ito, Nakita ko ang spark sa linya ng kuryente sa harap ng palengke maraming salamat po.",Power Hazard,Medium,tagalog
+"Nag-aalala kami huli ta May naheling kaming pitak sa daga sa mataas na lugar, tibaad maggaba pakiusap.",Landslide,Medium,bikol
+"Naghahapot ako kun igwa nang aksyon, An linya sa kalsada dai na naheheling, kaipuhan bagong pintura dakul na salamat.",Road Hazard,Low,bikol
+Ang kalsada sa aming barangay ay lubak lubak na mapanganib sa motorsiklo kailangan na talaga ng tulong.,Road Hazard,Medium,tagalog
+Alam ko po na marami kayong trabaho pero Ang kuryente ay lumalagyan ng apoy sa poste malapit sa paaralan kailangan na talaga ng tulong.,Power Hazard,High,tagalog
+Nag-aalala kami huli ta May nagtatambay sa atubangan kan samuyang harong kada banggi dakul na salamat.,Security,Low,bikol
+"Mahal na barangay tanggapan, Nakita ko ang usok mula sa bahay na walang tagaroon posibleng susunog maaari ba kayong tumulong?",Fire,High,tagalog
+"Nagtatanong po kung may aksyon na, Walang tubig kami tuwing umaga dapat ay may tubig nangyari ito kanina pa.",Utility,Medium,tagalog
+Biglang nahulog an dakulang parte kan bukid harani sa mga harong puwede daw kamong tumabang?,Landslide,High,bikol
+"Mataas na an baha sa samuyang lugar, halos sa daghan na kan mga tawo",Flooding,High,bikol
+"Pakiusap sana ay tulungan kami, Bumagsak ang retaining wall ng kalsada sa bundok napit ang mga sasakyan nangyari ito kanina pa.",Infrastructure,High,tagalog
+"Nagtatanong po kung may aksyon na, Ang water pressure sa aming lugar ay napakababa halos walang tubig maaari ba kayong tumulong?",Utility,Medium,tagalog
+"Nagtatanong po kung may aksyon na, Maraming adik na nakikita sa aming lugar gabi gabi kailangan ng aksyon umaasa po kaming maaksyunan ito.",Security,Medium,tagalog
+"Mahal na barangay tanggapan, Kailangan ng vitamins ang mga bata sa aming purok maraming salamat po.",Medical,Low,tagalog
+Alam ko po na marami kayong trabaho pero Maraming residente ang nagkakasakit posibleng dengue dapat mag-fumigate nangyari ito kanina pa.,Medical,Medium,tagalog
+Naputol an high tension wire asin nahulog sa palengke naglalaom kami na maaksyunan ini.,Power Hazard,High,bikol
+"Importante ini, May gurang na babaeng biglang naluya sa luwas kan harong niya salamat.",Medical,High,bikol
+"Pakiusap sana ay tulungan kami, Maraming tao ang nagkasakit matapos kumain sa canteen ng barangay maaari ba kayong tumulong?",Food,High,tagalog
+Gusto ko lang ireport na Ang aming kapit bahay ay matagal nang hindi kumakain kailangan ng tulong umaasa po kaming maaksyunan ito.,Medical,Medium,tagalog
+"Pakiusap sana ay tulungan kami, Naanod ang sasakyan namin dahil sa lakas ng agos ng tubig",Flooding,High,tagalog
+May bata na nalunod sa mababaw na tubig kailangan agad ng medikal,Medical,High,tagalog
+"Importante ini, Nagbaha na sa samuyang harong, gabos na gamit nalubugan na naglalaom kami na maaksyunan ini.",Flooding,High,bikol
+Bumagsak ang bubong ng abandonadong gusali may napit na tao sa loob umaasa po kaming maaksyunan ito.,Structural,High,tagalog
+Nag-aalala kami huli ta Naghihilaw nin dikit an kanal pero dai pa grabe tabangan niyo kami tabi.,Flooding,Low,bikol
+"Aram ko na dakul kamong trabaho pero Nahulog sa hagdan an sarong residente, dai na makahiro dakul na salamat.",Medical,High,bikol
+Alam ko po na marami kayong trabaho pero May nagko-korslot na linya ng kuryente sa gitna ng basa na kalsada,Power Hazard,High,tagalog
+May electric shock an sarong aki sa atubangan kan samuyang harong tabangan niyo kami tabi.,Power Hazard,High,bikol
+Nag aalala po kami dahil Nasunog ang basura sa tambak matagal nang ganito gusto ko lang ireport sana ay tulungan ninyo kami.,Fire,Low,tagalog
+Gusto ko lang ireport na Bumabaha ang kalsada at may peligro sa mga motorista kailangan na talaga ng tulong.,Flooding,Medium,tagalog
+Umabot na ang baha sa loob ng classroom at opisina ng barangay sana ay tulungan ninyo kami.,Flooding,High,tagalog
+Maraming pamilya ang naipit sa baha hindi makaalis ng bahay maaari ba kayong tumulong?,Flooding,High,tagalog
+"Mahal na barangay tanggapan, Nagtaas ng babala ang weather bureau malakas pang ulan darating kailangan na talaga ng tulong.",Flooding,High,tagalog
+"Mahal na barangay tanggapan, Nasunog ang kaunting pader ng bahay kontrol na pero kailangan pa rin suriin maraming salamat po.",Fire,Medium,tagalog
+Ang kalsada sa aming barangay ay lubak lubak na mapanganib sa motorsiklo kailangan ng agad na aksyon.,Road Hazard,Medium,tagalog
+Gusto ko sanang i-report na Daing kuryente ngunyan kaya nagrereport sana kun may nangyari pakiusap.,Utility,Low,bikol
+Gusto ko lang ireport na Bumabaha sa basement ng building kapag malakas ang ulan ito ay nangyari ngayon.,Flooding,Medium,tagalog
+"Importante po ito, Mababaw ang baha pero lumalamig na ang temperatura pwede pa lumaki pakiusap.",Flooding,Medium,tagalog
+"Dakul na adik an naheheling sa samuyang lugar kada banggi, kaipuhan aksyon",Security,Medium,bikol
+"May naheling na aso sa dumpsite, tibaad may nagkakalayo na basura salamat.",Fire,Medium,bikol
+Gusto ko lang ireport na May napansing usok sa dumpsite baka sumasamang basura pakiusap.,Fire,Medium,tagalog
+"Importante ini, Dakul na aki an may lagnat asin ubo sa samuyang purok naglalaom kami na maaksyunan ini.",Medical,Medium,bikol
+Gusto ko lang ireport na May lumang transformer sa aming lugar posibleng mapanganib na salamat po.,Power Hazard,Medium,tagalog
+"Nag-aalala kami huli ta Dakul na pitak an lanob kan samuyang eskwelahan, tibaad peligroso pakiusap.",Structural,Medium,bikol
+"Pakiusap sana ay tulungan kami, Nagguho ang gilid ng kalsada sa bundok hindi na ligtas ang daanan ito ay nangyari ngayon.",Landslide,High,tagalog
+"Mahal na barangay tanggapan, May nagtatalik ng away ng grupo sa kanto ng aming barangay mapanganib umaasa po kaming maaksyunan ito.",Security,High,tagalog
+Nakita ko ang usok mula sa bahay na walang tagaroon posibleng susunog salamat po.,Fire,High,tagalog
+Nag aalala po kami dahil Ang overpass ay may malaking bitak at delikado na sa mga gumagamit,Infrastructure,High,tagalog
+Gusto ko lang ireport na Sira ang mga manhole cover sa aming lugar delikado sa mga nagtatakbo,Infrastructure,Medium,tagalog
+Alam ko po na marami kayong trabaho pero May matanda na hirap huminga sinasabing masakit ang dibdib niya,Medical,High,tagalog
+Ang tulay ay may malaking butas na sa gitna delikado sa mga bata pakiusap.,Infrastructure,Medium,tagalog
+"Pakiusap sana ay tulungan kami, Nahulog ang transformer sa may palengke may apoy na lumalabas pakiusap.",Power Hazard,High,tagalog
+May nakita kaming ahas sa tabi ng ilog maliit lang naman ireport ko lang maraming salamat po.,Animal,Low,tagalog
+"Nagkakalayo an bodega sa gilid kan samuyang harong, kaipuhan nin BFP salamat.",Fire,High,bikol
+Nagkaroon ng seizure ang aking kapit bahay hindi siya makapag-abot ng tulong,Medical,High,tagalog
+Biglang bumaha ang kanal umabot na ang tubig sa loob ng bahay namin kailangan ng agad na aksyon.,Flooding,High,tagalog
+Hindi na kami makalabas ng bahay puno na ang daan ng tubig pakiusap.,Flooding,High,tagalog
+Alam ko po na marami kayong trabaho pero Ang fence ng barangay basketball court ay tilt na posibleng mabuwal kailangan ng agad na aksyon.,Structural,Medium,tagalog
+"Pakiusap sana ay tulungan kami, Biglang bumagsak ang malaking bahagi ng bundok malapit sa mga bahay ito ay nangyari ngayon.",Landslide,High,tagalog
+"Importante po ito, Naputol ang gas line malapit sa mga bahay mapanganib sa pagsabog maaari ba kayong tumulong?",Utility,High,tagalog
+Aram ko na dakul kamong trabaho pero An tulay sa samuyang barangay hababa na asin tibaad dai na matibay puwede daw kamong tumabang?,Structural,Medium,bikol
+"Pakiusap sana ay tulungan kami, May konting guho ng lupa sa tabi ng kalsada maliit lang naman umaasa po kaming maaksyunan ito.",Landslide,Low,tagalog
+"Pakiusap tabangan kami, Mataas na an baha sa samuyang lugar, halos sa daghan na kan mga tawo kaipuhan na gayod nin tabang.",Flooding,High,bikol
+Alam ko po na marami kayong trabaho pero Naputol ang daliri ng isang bata sa aksidente kailangan ng ospital umaasa po kaming maaksyunan ito.,Medical,High,tagalog
+Ang mga pusa at aso sa aming lugar ay walang bakuna dapat ayusin nangyari ito kanina pa.,Animal,Low,tagalog
+"Mahal na barangay tanggapan, Maraming residente ang nagsuka at nagtatae matapos sa fiesta salo salo",Food,High,tagalog
+Ang ilog ay pumatak na sa critical level paabot na sa mga kabahayan ito ay nangyari ngayon.,Flooding,High,tagalog
+"Pakiusap tabangan kami, Kaipuhan nin food assistance an dakul na pamilya sa samuyang barangay salamat.",Food,Medium,bikol
+"Importante po ito, Ang street light sa aming lugar ay naputulan ng ilaw gusto ko lang ireport salamat po.",Utility,Low,tagalog
+Bumabaha ang kalsada at may peligro sa mga motorista ito ay nangyari ngayon.,Flooding,Medium,tagalog
+Gusto ko lang ireport na Nasira ang tulay dahil sa lakas ng baha hindi na madaraanan maaari ba kayong tumulong?,Flooding,High,tagalog
+"Importante ini, May gurang na babaeng biglang naluya sa luwas kan harong niya kaipuhan na gayod nin tabang.",Medical,High,bikol
+Gusto ko lang ireport na Maraming butas sa daan sa aming sityo kailangan ng ayos,Road Hazard,Medium,tagalog
+"Nagtatanong po kung may aksyon na, Nakita ang isang lalaki na bumabasag ng bintana ng mga bahay sa gabi sana ay tulungan ninyo kami.",Security,High,tagalog
+"Pakiusap tabangan kami, Dakul na tawo an naghelang pagkatapos kumaon sa kantina kan barangay kaipuhan na gayod nin tabang.",Food,High,bikol
+Naputol ang high tension wire at bumagsak sa palengke,Power Hazard,High,tagalog
+"Nagtatanong po kung may aksyon na, Ang aming kapit bahay ay matagal nang hindi kumakain kailangan ng tulong maaari ba kayong tumulong?",Medical,Medium,tagalog
+Gusto ko lang ireport na Ang nakababa na wire sa bukid ay nakasalpak sa basa na puno mapanganib kailangan na talaga ng tulong.,Power Hazard,High,tagalog
+Gusto ko lang ireport na Naputol ang linya ng kuryente nahulog sa may basang daan mapanganib maraming salamat po.,Utility,High,tagalog
+"Dai nagfufunction an traffic light sa interseksyon, peligroso",Road Hazard,Medium,bikol
+"Igwa nin pagkagaba kan daga sa itaas kan bukid, nakaharang an dalan pasiring digdi kaipuhan na gayod nin tabang.",Landslide,High,bikol
+Alam ko po na marami kayong trabaho pero Nahulog ang puno sa gitna ng kalsada hindi madaraanan sana ay tulungan ninyo kami.,Road Hazard,High,tagalog
+"Nagtatanong po kung may aksyon na, Ang kalsada sa aming barangay ay lubak lubak na mapanganib sa motorsiklo sana ay tulungan ninyo kami.",Road Hazard,Medium,tagalog
+"Naheling ko an sarong tawong may hawak na lading, nagbabanta sa mga tawo ini nangyari ngunyan.",Security,High,bikol
+Ang lupa sa gilid ng bahay namin ay lumalagpas na posibleng magguho ito ay nangyari ngayon.,Landslide,Medium,tagalog
+"Mahal na barangay tanggapan, Ang lumang barangay hall ay may mga bitak na sa pader kailangan na suriin ito ay nangyari ngayon.",Structural,Medium,tagalog
+May taong nahimatay sa kalsada kailangan ng ambulansya umaasa po kaming maaksyunan ito.,Medical,High,tagalog
+"Nahulog an dakulang gapo hali sa bukid, nakaharang sa dalan tabangan niyo kami tabi.",Road Hazard,High,bikol
+Alam ko po na marami kayong trabaho pero Ang landslide ay sumakop sa dalawang bahay kailangan ng rescue agad umaasa po kaming maaksyunan ito.,Landslide,High,tagalog
+Ang drainage sa aming lugar ay sira na palagi kaming nababaha pakiusap.,Utility,Medium,tagalog
+"Pakiusap sana ay tulungan kami, Ang bahay ng aming kapitbahay ay malapit nang bumagsak kailangan lumikas",Structural,High,tagalog
+Nag aalala po kami dahil May konting usok mula sa kalan ng kapitbahay wala naman malaking problema kailangan na talaga ng tulong.,Fire,Low,tagalog
+"Naghahapot ako kun igwa nang aksyon, May electric shock an sarong aki sa atubangan kan samuyang harong kaipuhan nin tulong ngunyan.",Power Hazard,High,bikol
+"Mahal na tanggapan kan barangay, Naghihilaw an salog asin nag-aalsa na sa mga harong sa gilid pakiusap.",Flooding,High,bikol
+Gusto ko lang ireport na Malaki ang sunog sa pabrika apoy lumalabas na sa bubong maraming salamat po.,Fire,High,tagalog
+Alam ko po na marami kayong trabaho pero May bata na allergic at nangangailangan ng medisin hindi sila makabili pakiusap.,Medical,Medium,tagalog
+Nakita ko ang spark sa linya ng kuryente sa harap ng palengke maraming salamat po.,Power Hazard,Medium,tagalog
+"Importante po ito, May nakulong na tao sa loob ng bahay hindi makalabas dahil sa baha ito ay nangyari ngayon.",Flooding,High,tagalog
+"Kinagat kan ayam an sarong aki na yaon sa dalan, kaipuhan nin tabang medikal",Animal,High,bikol
+"Nagtatanong po kung may aksyon na, May sunog sa informal settler area doon sa kabila maraming nasusunog umaasa po kaming maaksyunan ito.",Fire,High,tagalog
+Ang guardrail sa mataas na daan ay sira na at mapanganib pakiusap.,Road Hazard,Medium,tagalog
+"Nagtatanong po kung may aksyon na, May buntis na manganganak na kailangan ng agad na sasakyan papunta ospital umaasa po kaming maaksyunan ito.",Medical,High,tagalog
+"Gaba na an speed bump sa atubangan kan eskwelahan, peligroso sa mga aki puwede daw kamong tumabang?",Road Hazard,Medium,bikol
+Biglang natumba ang lalaki sa kalsada walang makatulong sa kanya ito ay nangyari ngayon.,Medical,High,tagalog
+Nag aalala po kami dahil Ang aming kapit bahay ay matagal nang hindi kumakain kailangan ng tulong nangyari ito kanina pa.,Medical,Medium,tagalog
+"Pakiusap tabangan kami, Dakulang sunog sa palengke, nagdadakula pa an kalayo, kaipuhan nin tabang tabangan niyo kami tabi.",Fire,High,bikol
+Alam ko po na marami kayong trabaho pero May malaking hukay sa kalsada na mapanganib lalo na sa gabi maraming salamat po.,Road Hazard,Medium,tagalog
+"Nagtatanong po kung may aksyon na, Maliit lang ang baha pero lumalaki na kailangan bantayan kailangan ng agad na aksyon.",Flooding,Medium,tagalog
+Dakul na daga na naghahaluwas sa samuyang lugar puon kan pagbaha ini nangyari ngunyan.,Animal,Medium,bikol
+"Naghahapot ako kun igwa nang aksyon, Nahulog sa hagdan an sarong residente, dai na makahiro kaipuhan na gayod nin tabang.",Medical,High,bikol
+Gusto ko sanang i-report na Gusto ko sanang i-report na an samuyang poste medyo naghihiro na naglalaom kami na maaksyunan ini.,Power Hazard,Low,bikol
+Nag-aalala kami huli ta Gusto ko sanang i-report na luag an takop kan drainage sa samuyang dalan,Utility,Low,bikol
+"Nagtatanong po kung may aksyon na, Bumagsak ang poste sa gitna ng kalsada may nakabitin na linya maaari ba kayong tumulong?",Utility,High,tagalog
+"Pakiusap sana ay tulungan kami, May buntis na manganganak na kailangan ng agad na sasakyan papunta ospital kailangan na talaga ng tulong.",Medical,High,tagalog
+"Mahal na barangay tanggapan, Bumagsak ang malaking bato mula sa bundok naharang ang daan maaari ba kayong tumulong?",Road Hazard,High,tagalog
+"Importante ini, May ayam na daing kagsadiri na nagkakagat nin mga tawo sa samuyang lugar, peligroso kaipuhan na gayod nin tabang.",Animal,High,bikol
+May nakita kaming bitak sa lupa sa mataas na lugar posibleng magguho nangyari ito kanina pa.,Landslide,Medium,tagalog
+Walang tubig na iniinom sa aming lugar tatlong araw na ito,Utility,High,tagalog
+"Mahal na tanggapan kan barangay, Nahulog an daga hali sa mataas na parte pasiring sa mga harong sa ibaba",Landslide,High,bikol
+Alam ko po na marami kayong trabaho pero Nakita ko ang usok mula sa bahay na walang tagaroon posibleng susunog,Fire,High,tagalog
+"Pakiusap sana ay tulungan kami, Ang pintuan ng sityo hall ay sira na mahirap buksan ito ay nangyari ngayon.",Structural,Low,tagalog
+Alam ko po na marami kayong trabaho pero May nag-aaway at gumagamit ng armas sa palengke kailangan ng pulis agad,Security,High,tagalog
+"Gusto ko sanang i-report na Nahulog an transformer harani sa palengke, may kalayong naluluwas",Power Hazard,High,bikol
+"Mahal na tanggapan kan barangay, Biglang naghabon an baha, nakaabot na sa laog kan harong mi pakiusap.",Flooding,High,bikol
+"Mahal na barangay tanggapan, Naputol ang power line at bumagsak sa kalsada delikado sa mga tao maaari ba kayong tumulong?",Utility,High,tagalog
+Gusto ko lang ireport na Maraming tao ang nagkasakit matapos kumain sa canteen ng barangay,Food,High,tagalog
+Nag aalala po kami dahil Umaapaw ng kaunti ang kanal pero hindi pa malaki ang epekto umaasa po kaming maaksyunan ito.,Flooding,Low,tagalog
+Nahulog ang transformer malapit sa bahay may electric hazard maraming salamat po.,Utility,High,tagalog
+"Pakiusap sana ay tulungan kami, Bukas na ang manhole cover sa gitna ng daan nakita ko na ang ilang nadaanan pakiusap.",Road Hazard,High,tagalog
+"May naaamoy na maraot hali sa gadan na hayop sa salog, kaipuhan halion tabangan niyo kami tabi.",Animal,Medium,bikol
+"Importante ini, Dai nagfufunction an traffic light sa interseksyon, peligroso puwede daw kamong tumabang?",Road Hazard,Medium,bikol
+"Nagtatanong po kung may aksyon na, May taong nahimatay sa kalsada kailangan ng ambulansya pakiusap.",Medical,High,tagalog
+Gusto ko lang ireport na Ang sewage system ay sumabog at nagdulot ng polusyon sa mga bahay salamat po.,Infrastructure,High,tagalog
+"Naputol an linya nin kuryente asin nahulog sa kalsada, peligroso puwede daw kamong tumabang?",Utility,High,bikol
+"Dakul na residente an naghehelang, tibaad dengue, kaipuhan nin fumigation",Medical,Medium,bikol
+Gusto ko lang ireport na Kailangan ng vitamins ang mga bata sa aming purok,Medical,Low,tagalog
+"Importante po ito, Nahulog ang transformer sa may palengke may apoy na lumalabas kailangan ng agad na aksyon.",Power Hazard,High,tagalog
+"Importante ini, May sadit na pagkagaba kan daga sa gilid kan kalsada, sadit sana man pakiusap.",Landslide,Low,bikol
+Nakita ko ang spark sa linya ng kuryente sa harap ng palengke,Power Hazard,Medium,tagalog
+Nag aalala po kami dahil May maliit na sunog sa kangkungan sa likod ng barangay hall ito ay nangyari ngayon.,Fire,Medium,tagalog
+"Mahal na barangay tanggapan, Nagguho ang gilid ng kalsada sa bundok hindi na ligtas ang daanan maaari ba kayong tumulong?",Landslide,High,tagalog
+Alam ko po na marami kayong trabaho pero Ang wiring sa isang bahay ay luma na at baka magkorslot pakiusap.,Power Hazard,Medium,tagalog
+"Importante po ito, Nasunog ang mga tuyong dahon sa likod ng paaralan nabugaw na salamat po.",Fire,Low,tagalog
+Nag aalala po kami dahil Kailangan ng libreng medical mission ang aming barangay maraming pasyente maraming salamat po.,Medical,Medium,tagalog
+"Aram ko na dakul kamong trabaho pero May tawong nawaran nin malay sa kalsada, kaipuhan nin ambulansya pakiusap.",Medical,High,bikol
+Daing tubig na maiinom sa samuyang lugar sa tulong aldaw na ini ini nangyari ngunyan.,Utility,High,bikol
+"Pakiusap sana ay tulungan kami, Ang mga bata ay naglaro ng posporo malapit sa mga kahoy posibleng masunog",Fire,Medium,tagalog
+"Nagtatanong po kung may aksyon na, May nang-aagaw ng bag sa aming lugar maraming beses nang nangyari maraming salamat po.",Security,High,tagalog
+"Naghahapot ako kun igwa nang aksyon, Nagkalayo an pabrika, an kalayo nag-aabot na sa atop tabangan niyo kami tabi.",Fire,High,bikol
+"Mahal na tanggapan kan barangay, Dakul na residente an dai nakakakaon huli sa kadaihan nin pagkaon ini nangyari ngunyan.",Food,Medium,bikol
+"Importante po ito, May live wire na nahulog sa kalsada mapanganib sa lahat umaasa po kaming maaksyunan ito.",Power Hazard,High,tagalog
+"Gusto ko sanang i-report na An daan na barangay hall igwa nin mga pitak na sa lanob, kaipuhan suhayan kaipuhan nin tulong ngunyan.",Structural,Medium,bikol
+"Mahal na barangay tanggapan, Ang mga bata ay naglaro ng posporo malapit sa mga kahoy posibleng masunog sana ay tulungan ninyo kami.",Fire,Medium,tagalog
+"Nagtatanong po kung may aksyon na, May maliit na sunog sa kangkungan sa likod ng barangay hall nangyari ito kanina pa.",Fire,Medium,tagalog
+"Importante po ito, Ang gusali sa aming lugar ay may malalaking bitak sa pader mapanganib kailangan na talaga ng tulong.",Structural,High,tagalog
+"Mahal na barangay tanggapan, Ang lupa sa gilid ng bahay namin ay lumalagpas na posibleng magguho kailangan ng agad na aksyon.",Landslide,Medium,tagalog
+Mababaw ang baha pero lumalamig na ang temperatura pwede pa lumaki kailangan ng agad na aksyon.,Flooding,Medium,tagalog
+Gusto ko lang ireport na Nasunog ang basura sa tambak matagal nang ganito gusto ko lang ireport ito ay nangyari ngayon.,Fire,Low,tagalog
+Aram ko na dakul kamong trabaho pero May electric shock an sarong aki sa atubangan kan samuyang harong dakul na salamat.,Power Hazard,High,bikol
+Nahulog ang kaunting lupa sa drainage gusto ko lang ireport ito ay nangyari ngayon.,Landslide,Low,tagalog
+"An gusali sa samuyang lugar igwa nin dakulang pitak sa lanob, peligroso",Structural,High,bikol
+Ang drainage system ay sira na kaya palaging nagbabaha,Flooding,Medium,tagalog
+"Nagtatanong po kung may aksyon na, May pagguho ng lupa sa estero naharang na ang daloy ng tubig maaari ba kayong tumulong?",Landslide,High,tagalog
+"Importante po ito, Ang creek sa likod ng barangay ay umaapaw na kapag malakas ang ulan salamat po.",Flooding,Medium,tagalog
+"Importante ini, Nagkagaba an tulay huli sa kusog kan baha, dai na madadaanan salamat.",Flooding,High,bikol
+Nakakita kami ng apoy sa abandonadong bahay posibleng sinusunog ng vandals nangyari ito kanina pa.,Fire,Medium,tagalog
+"Nagtatanong po kung may aksyon na, Ang tubig na ininom ng mga bata ay may kakaibang amoy posibleng kontaminado kailangan ng agad na aksyon.",Food,High,tagalog
+Alam ko po na marami kayong trabaho pero Ang mga kabataan ay nagtitipon sa gabi at may ingay na naririnig pakiusap.,Security,Medium,tagalog
+Naputol ang main water pipe lahat kami walang tubig maraming salamat po.,Utility,High,tagalog
+Gusto ko lang ireport na May nakita kaming mga bato sa kalsada baka nanggaling sa bundok nangyari ito kanina pa.,Landslide,Low,tagalog
+"Pakiusap sana ay tulungan kami, Ang aking kapitbahay ay nagrereklamo ng paulit ulit na pagnanakaw nangyari ito kanina pa.",Security,Medium,tagalog
+"Nagtatanong po kung may aksyon na, Bumagsak ang poste ng kuryente sa harap ng aming bahay pakiusap.",Utility,High,tagalog
+Gusto ko lang ireport na Nakita ko ang usok mula sa bahay na walang tagaroon posibleng susunog ito ay nangyari ngayon.,Fire,High,tagalog
+Kailangan ng vitamins ang mga bata sa aming purok sana ay tulungan ninyo kami.,Medical,Low,tagalog
+"Naghahapot ako kun igwa nang aksyon, Nahulog sa hagdan an sarong residente, dai na makahiro kaipuhan na gayod nin tabang.",Medical,High,bikol
+Ang wiring sa isang bahay ay luma na at baka magkorslot maaari ba kayong tumulong?,Power Hazard,Medium,tagalog
+"Pakiusap sana ay tulungan kami, Nagko-korslot ang wiring sa poste sa labas ng aming bahay kailangan ng agad na aksyon.",Utility,Medium,tagalog
+"Nagtatanong po kung may aksyon na, Kailangan ng vitamins ang mga bata sa aming purok",Medical,Low,tagalog
+"Nagtatanong po kung may aksyon na, Ang tulay sa aming lugar ay may malaking bitak mapanganib ang pagtawid kailangan ng agad na aksyon.",Structural,High,tagalog
+"Mahal na barangay tanggapan, May sunog sa informal settler area doon sa kabila maraming nasusunog",Fire,High,tagalog
+"Importante po ito, Naputol ang high tension wire at bumagsak sa palengke maaari ba kayong tumulong?",Power Hazard,High,tagalog
+Dalawang bahay na naanod sa baha kailangan agad ng tulong kailangan ng agad na aksyon.,Flooding,High,tagalog
+"Importante po ito, Ang drainage pipe ay sumabog at may umaapaw na dumi sa kalsada kailangan ng agad na aksyon.",Infrastructure,High,tagalog
+"Nagtatanong po kung may aksyon na, Nalaglag ang overpass bridge component sa kalsada delikado sa mga sasakyan",Road Hazard,High,tagalog
+Gusto ko lang ireport na Ang poste sa likod ng bahay ay medyo yumuko na gusto ko lang ipaalam ito ay nangyari ngayon.,Utility,Low,tagalog
+"Mahal na barangay tanggapan, Ang estero sa amin ay lagi nang umaapaw kapag umuulan",Flooding,Medium,tagalog
+"Importante po ito, Ang aking kapitbahay ay nagrereklamo ng paulit ulit na pagnanakaw",Security,Medium,tagalog
+Malaking landslide sa kabundukan naiipit ang ilang pamilya sa ibaba umaasa po kaming maaksyunan ito.,Landslide,High,tagalog
+"Pakiusap sana ay tulungan kami, Nahulog ang transformer malapit sa bahay may electric hazard umaasa po kaming maaksyunan ito.",Utility,High,tagalog
+Gusto ko lang ireport na May pinaghihinalaang drug den sa katabing bahay kailangan ng imbestigasyon,Security,Medium,tagalog
+"Mahal na tanggapan kan barangay, Nagaba an pangenot na kalsada, dai na madadaanan kan mga sasakyan tabangan niyo kami tabi.",Infrastructure,High,bikol
+Alam ko po na marami kayong trabaho pero Ang mga bata ay naglaro ng posporo malapit sa mga kahoy posibleng masunog nangyari ito kanina pa.,Fire,Medium,tagalog
+Ang mga bangketa sa aming lugar ay hindi na magamit sira na lahat nangyari ito kanina pa.,Infrastructure,Medium,tagalog
+Aram ko na dakul kamong trabaho pero Dakul na gapo an nahulog hali sa taas ngunyan na tag-uran salamat.,Landslide,Medium,bikol
+"Pakiusap sana ay tulungan kami, Maraming asong gala sa aming lugar nakakadismaya at delikado sa mga bata umaasa po kaming maaksyunan ito.",Animal,Medium,tagalog
+"Importante po ito, May matandang babaeng biglang nanghina sa labas ng bahay niya umaasa po kaming maaksyunan ito.",Medical,High,tagalog
+Alam ko po na marami kayong trabaho pero Malaking sunog sa palengke lumalaki na ang apoy kailangan ng tulong maaari ba kayong tumulong?,Fire,High,tagalog
+"Nagtatanong po kung may aksyon na, Ang bundok sa taas ay nagpapakita ng ilang bitak posibleng landslide kailangan na talaga ng tulong.",Landslide,Medium,tagalog
+"Naghahapot ako kun igwa nang aksyon, Natumba an atop kan alang na gusali, may naipit na tawo sa laog",Structural,High,bikol
+"Nagbaha na sa samuyang harong, gabos na gamit nalubugan na dakul na salamat.",Flooding,High,bikol
+"An gusali sa samuyang lugar igwa nin dakulang pitak sa lanob, peligroso ini nangyari ngunyan.",Structural,High,bikol
+"Pakiusap sana ay tulungan kami, Bumagsak ang malaking bahagi ng tulay sa aming lugar delikado kailangan ng agad na aksyon.",Infrastructure,High,tagalog
+Gusto ko lang ireport na Gusto ko lang ireport na may mga estranyo na nakikita sa aming lugar,Security,Low,tagalog
+"Nagtatanong po kung may aksyon na, Nagtaas ng babala ang weather bureau malakas pang ulan darating nangyari ito kanina pa.",Flooding,High,tagalog
+Gusto ko sanang i-report na Kaipuhan nin food assistance an dakul na pamilya sa samuyang barangay pakiusap.,Food,Medium,bikol
+"Nagtatanong po kung may aksyon na, May konting genggeng sa daan dahil sa ulan kanina salamat po.",Flooding,Low,tagalog
+Ang bahay ay gumuho matapos ang lindol may napit na pamilya umaasa po kaming maaksyunan ito.,Structural,High,tagalog
+Nag-aalala kami huli ta Gaba na an drainage kaya parati kaming binabaha tabangan niyo kami tabi.,Flooding,Medium,bikol
+"Importante po ito, Malaki ang sunog sa pabrika apoy lumalabas na sa bubong maaari ba kayong tumulong?",Fire,High,tagalog
+Biglang bumaha ang kanal umabot na ang tubig sa loob ng bahay namin kailangan na talaga ng tulong.,Flooding,High,tagalog
+Alam ko po na marami kayong trabaho pero Nagtaas ng babala ang weather bureau malakas pang ulan darating kailangan ng agad na aksyon.,Flooding,High,tagalog
+"Naghahapot ako kun igwa nang aksyon, Natumba an retaining wall kan kalsada sa bukid, naipit an mga sasakyan",Infrastructure,High,bikol
+"May nahulog na buhay na alambre sa kalsada, peligroso sa gabos kaipuhan nin tulong ngunyan.",Power Hazard,High,bikol
+"Importante po ito, Maraming pamilya ang nawalan ng tirahan dahil sa malaking baha",Flooding,High,tagalog
+Bumagsak ang retaining wall ng kalsada sa bundok napit ang mga sasakyan maaari ba kayong tumulong?,Infrastructure,High,tagalog
+May nagnakaw ng motorsiklo sa aming barangay kararating lang ng insidente kailangan ng agad na aksyon.,Security,High,tagalog
+Nagguho ang lupa sa gilid ng kalsada sa bundok peligroso sa mga sasakyan maraming salamat po.,Landslide,High,tagalog
+"Mahal na tanggapan kan barangay, An pinto kan sityo hall sira na, masakit buksan ini nangyari ngunyan.",Structural,Low,bikol
+"Nagtatanong po kung may aksyon na, Nagko-korslot ang wiring sa poste sa labas ng aming bahay ito ay nangyari ngayon.",Utility,Medium,tagalog
+"Pakiusap tabangan kami, Nahulog an kahoy sa tahaw kan kalsada, dai na madadaanan",Road Hazard,High,bikol
+Ang drainage sa aming lugar ay sira na palagi kaming nababaha kailangan na talaga ng tulong.,Utility,Medium,tagalog
+An kalsada sa samuyang sityo garo lubak-lubak na asin gaba an drainage pakiusap.,Infrastructure,Medium,bikol
+Gusto ko lang ireport na Nasira ang kalsada matapos ang baha may malaking butas sa daan sana ay tulungan ninyo kami.,Road Hazard,High,tagalog
+Alam ko po na marami kayong trabaho pero Maraming pamilya ang naipit sa baha hindi makaalis ng bahay maraming salamat po.,Flooding,High,tagalog
+"Mahal na tanggapan kan barangay, Dakul na residente an naghehelang, tibaad dengue, kaipuhan nin fumigation",Medical,Medium,bikol
+Walang tubig na iniinom sa aming lugar tatlong araw na ito maraming salamat po.,Utility,High,tagalog
+Nagbabaha sa kalsada tuwing umuulan hindi na maraanan,Flooding,Medium,tagalog
+"Nagtatanong po kung may aksyon na, May electric shock ang isang bata sa tapat ng aming bahay maaari ba kayong tumulong?",Power Hazard,High,tagalog
+"Nagtatanong po kung may aksyon na, May malaking hukay sa kalsada na mapanganib lalo na sa gabi kailangan na talaga ng tulong.",Road Hazard,Medium,tagalog
+Alam ko po na marami kayong trabaho pero Ang estero sa amin ay lagi nang umaapaw kapag umuulan,Flooding,Medium,tagalog
+May napansing usok sa dumpsite baka sumasamang basura maaari ba kayong tumulong?,Fire,Medium,tagalog
+Gusto ko lang ireport na Bumagsak ang malaking bato mula sa bundok naharang ang daan umaasa po kaming maaksyunan ito.,Road Hazard,High,tagalog
+An kalsada sa samuyang sityo garo lubak-lubak na asin gaba an drainage,Infrastructure,Medium,bikol
+Gusto ko lang ireport na Biglang bumagsak ang kisame ng paaralan may mga bata sa loob sana ay tulungan ninyo kami.,Structural,High,tagalog
+Alam ko po na marami kayong trabaho pero Ang tulay sa aming lugar ay may malaking bitak mapanganib ang pagtawid umaasa po kaming maaksyunan ito.,Structural,High,tagalog
+May sunog sa informal settler area doon sa kabila maraming nasusunog pakiusap.,Fire,High,tagalog
+"Nahulog an dakulang poste sa tahaw kan highway, ayuson na tabi salamat.",Road Hazard,High,bikol
+Gusto ko lang ireport na may nagbebenta ng expired na pagkain sa tindahan maraming salamat po.,Food,Low,tagalog
+"Pakiusap tabangan kami, Naghihilaw an baha sa kalsada tuwing nag-uuran ini nangyari ngunyan.",Flooding,Medium,bikol
+Alam ko po na marami kayong trabaho pero Ang mga bata ay naglaro ng posporo malapit sa mga kahoy posibleng masunog umaasa po kaming maaksyunan ito.,Fire,Medium,tagalog
+"Naputol an pangenot na tubo nin tubig, gabos kami daing tubig dakul na salamat.",Utility,High,bikol
+"Naghahapot ako kun igwa nang aksyon, An tulay sa samuyang lugar igwa nin dakulang pitak, peligroso baklayon",Structural,High,bikol
+Maraming beses nang nagnakaw ng gulay sa aming sityo kailangan ng aksyon maaari ba kayong tumulong?,Security,Medium,tagalog
+"Importante po ito, Ang tulay ay may malaking butas na sa gitna delikado sa mga bata salamat po.",Infrastructure,Medium,tagalog
+Alam ko po na marami kayong trabaho pero Ang drainage pipe ay sumabog at may umaapaw na dumi sa kalsada,Infrastructure,High,tagalog
+"Aram ko na dakul kamong trabaho pero An pinto kan barangay basketball court sira na, dai nasasara",Infrastructure,Low,bikol
+"Aram ko na dakul kamong trabaho pero Sasadit na lungag sa kalsada, gusto ko sanang i-report para maayos dakul na salamat.",Road Hazard,Low,bikol
+"Importante ini, Naputol an linya nin kuryente asin nahulog sa kalsada, peligroso naglalaom kami na maaksyunan ini.",Utility,High,bikol
+Konting tubig sa likod ng bahay sanay na kami pero ireport ko lang kailangan ng agad na aksyon.,Flooding,Low,tagalog
+"May nasakitan sa samuyang kataed, kaipuhan tulos nin tabang",Medical,High,bikol
+"Pakiusap sana ay tulungan kami, May maliit na sunog sa kangkungan sa likod ng barangay hall",Fire,Medium,tagalog
+Alam ko po na marami kayong trabaho pero Ang pintuan ng barangay basketball court ay sira na hindi masara umaasa po kaming maaksyunan ito.,Infrastructure,Low,tagalog
+Ang mga bata ay naglaro ng posporo malapit sa mga kahoy posibleng masunog ito ay nangyari ngayon.,Fire,Medium,tagalog
+Gusto ko lang ireport na Bumagsak ang malaking bato mula sa bundok tumama sa bahay ng kapitbahay kailangan na talaga ng tulong.,Landslide,High,tagalog
+"Nagtatanong po kung may aksyon na, Nasunog ang apat na bahay sa aming sityo kailangan ng rescue maaari ba kayong tumulong?",Fire,High,tagalog
+Ang isda sa palengke ay matagal na at may amoy na kailangan suriin umaasa po kaming maaksyunan ito.,Food,Medium,tagalog
+Alam ko po na marami kayong trabaho pero Ang waiting shed sa kanto ay gumuguho na kailangan ng bagong istruktura maaari ba kayong tumulong?,Structural,Medium,tagalog
+May bitak sa plasa ng barangay maliit lang naman pero gusto ko lang ireport kailangan ng agad na aksyon.,Structural,Low,tagalog
+"Nag-aalala kami huli ta An wiring kan sarong harong daan na, tibaad magkorto-sirkito",Power Hazard,Medium,bikol
+"Nag-aalala kami huli ta Naaksidente an sakuyang kataed, kaipuhan nin dagos na tabang medikal naglalaom kami na maaksyunan ini.",Medical,High,bikol
+"Importante po ito, Nasunog ang kaunting pader ng bahay kontrol na pero kailangan pa rin suriin kailangan ng agad na aksyon.",Fire,Medium,tagalog
+"Pakiusap sana ay tulungan kami, May mabahong amoy mula sa patay na hayop sa ilog kailangan alisin umaasa po kaming maaksyunan ito.",Animal,Medium,tagalog
+Ang mga alagang aso ng kapitbahay ay palaging umaatake sa mga dumaan nangyari ito kanina pa.,Animal,Medium,tagalog
+Nag aalala po kami dahil May nahulog na container van sa kalsada delikado sa mga sasakyan,Road Hazard,High,tagalog
+"Mahal na barangay tanggapan, Bumagsak ang malaking bahagi ng tulay sa aming lugar delikado",Infrastructure,High,tagalog
+"Nag-aalala kami huli ta Naghali sa kalan an sunog, luway-luway nag-aabot sa ibang harong pakiusap.",Fire,High,bikol
+Gusto ko lang ireport na Maraming bata ang may lagnat at ubo sa aming purok,Medical,Medium,tagalog
+"Mahal na barangay tanggapan, May nagtatalik ng away ng grupo sa kanto ng aming barangay mapanganib pakiusap.",Security,High,tagalog
+"Importante ini, Nagaba an pangenot na kalsada, dai na madadaanan kan mga sasakyan",Infrastructure,High,bikol
+Gusto ko sanang i-report na May konting tubig sa gilid kan tulay huli sa uran pakiusap.,Flooding,Low,bikol
+Palagi kaming nababaha dahil sa mataas na lugar sa paligid namin salamat po.,Flooding,Medium,tagalog
+"Mahal na barangay tanggapan, Nasunog ang kamay ng bata habang naglalaro malapit sa kalan kailangan ng tulong pakiusap.",Medical,High,tagalog
+Ang aming sityo ay kulang sa ilaw sa gabi posibleng hindi ligtas kailangan na talaga ng tulong.,Security,Low,tagalog
+"Pakiusap tabangan kami, Natumba an retaining wall kan kalsada sa bukid, naipit an mga sasakyan kaipuhan na gayod nin tabang.",Infrastructure,High,bikol
+Alam ko po na marami kayong trabaho pero Nahulog ang isang residente mula sa hagdan hindi na makagalaw,Medical,High,tagalog
+"Importante po ito, Nagtaas ng babala ang weather bureau malakas pang ulan darating maraming salamat po.",Flooding,High,tagalog
+Gusto ko lang ireport na May sunog sa talipapa mabilis kumakalat dahil sa hangin umaasa po kaming maaksyunan ito.,Fire,High,tagalog
+"Pakiusap sana ay tulungan kami, Ang aking kapitbahay ay nagrereklamo ng paulit ulit na pagnanakaw",Security,Medium,tagalog
+"Aram ko na dakul kamong trabaho pero Maribok an mga kabataan sa kanto kada banggi, dai kami makaturog",Security,Low,bikol
+May nahulog na container van sa kalsada delikado sa mga sasakyan,Road Hazard,High,tagalog
+"Gusto ko sanang i-report na An tubig na ininom kan mga aki igwa nin kakaibang kahamis, tibaad kontaminado salamat.",Food,High,bikol
+"Nagtatanong po kung may aksyon na, May ulol na aso sa aming lugar kinagat na ang tatlong tao kailangan tulungan",Animal,High,tagalog
+"Importante po ito, Maraming residente ang nagsuka at nagtatae matapos sa fiesta salo salo ito ay nangyari ngayon.",Food,High,tagalog
+"Pakiusap tabangan kami, Nahulog sa hagdan an sarong residente, dai na makahiro",Medical,High,bikol
+"Pakiusap sana ay tulungan kami, Ang baha ay umabot na sa bubungan ng mababang bahay dito sa amin pakiusap.",Flooding,High,tagalog
+"Importante ini, May naheling na aso sa dumpsite, tibaad may nagkakalayo na basura kaipuhan nin tulong ngunyan.",Fire,Medium,bikol
+Naanod ang sasakyan namin dahil sa lakas ng agos ng tubig pakiusap.,Flooding,High,tagalog
+"Importante po ito, Ang kalsada sa aming sityo ay lubak lubak na at sira ang drainage ito ay nangyari ngayon.",Infrastructure,Medium,tagalog
+Alam ko po na marami kayong trabaho pero Gusto ipaalala na kailangan ng rabies vaccine sa mga aso dito maraming salamat po.,Medical,Low,tagalog
+"Importante po ito, Naputol ang linya ng kuryente nahulog sa may basang daan mapanganib kailangan na talaga ng tulong.",Utility,High,tagalog
+"Importante po ito, May pagguho ng lupa sa taas ng bundok naharang ang daan pababa umaasa po kaming maaksyunan ito.",Landslide,High,tagalog
+"Mahal na tanggapan kan barangay, Dakul na pamilya an nagkaipit sa baha, kaipuhan nin rescue tulos kaipuhan na gayod nin tabang.",Flooding,High,bikol
+"Gusto ko sanang i-report na Igwa nin mga tawong nasyerak sa harong huli sa baha, dai makaluwas",Flooding,High,bikol
+"Nagtatanong po kung may aksyon na, Maraming bitak ang pader ng aming eskwelahan posibleng delikado pakiusap.",Structural,Medium,tagalog
+Nag aalala po kami dahil Biglang bumaha ang kanal umabot na ang tubig sa loob ng bahay namin kailangan ng agad na aksyon.,Flooding,High,tagalog
+"Pakiusap sana ay tulungan kami, Maraming nagkakasakit sa aming lugar mula nang bumuhos ang baha salamat po.",Medical,Medium,tagalog
+"Importante ini, Parati kaming daing kuryente sa banggi, nagduman na kami sa barangay hall",Utility,Medium,bikol
+"Aram ko na dakul kamong trabaho pero Igwa nin mga tawong nasyerak sa harong huli sa baha, dai makaluwas puwede daw kamong tumabang?",Flooding,High,bikol
+Alam ko po na marami kayong trabaho pero Nakita ang malaking ahas sa loob ng bahay ng kapitbahay namin kailangan ng rescue salamat po.,Animal,High,tagalog
+Bumagsak ang poste sa gitna ng kalsada may nakabitin na linya ito ay nangyari ngayon.,Utility,High,tagalog
+"Nahulog an kahoy sa tahaw kan kalsada, dai na madadaanan",Road Hazard,High,bikol
+Bumagsak ang lupa mula sa mataas na bahagi patungo sa mga bahay sa ilalim nangyari ito kanina pa.,Landslide,High,tagalog
+Gusto ko lang ireport na may mga estranyo na nakikita sa aming lugar sana ay tulungan ninyo kami.,Security,Low,tagalog
+"Nagtatanong po kung may aksyon na, Nakita ko ang usok mula sa bahay na walang tagaroon posibleng susunog nangyari ito kanina pa.",Fire,High,tagalog
+"Pakiusap sana ay tulungan kami, May nagtatalik ng barilan sa aming lugar takot na ang mga residente",Security,High,tagalog
+"Naghahapot ako kun igwa nang aksyon, Nagkakalayo an basura sa likod kan kalsada, may aso na nagluluwas",Fire,Medium,bikol
+Ang sewage system ay sumabog at nagdulot ng polusyon sa mga bahay,Infrastructure,High,tagalog
+Gusto ko lang ireport na Gusto ko lang ireport na baka kailangan na ng bagong tubig pipes dito pakiusap.,Utility,Low,tagalog
+Aram ko na dakul kamong trabaho pero Nahulog an poste nin kuryente sa atubangan kan samuyang harong,Utility,High,bikol
+"Importante po ito, Ang mga linya ay magkadikit na sa kalye mapanganib sa mga motorsiklo",Power Hazard,Medium,tagalog
+"Importante ini, Dakul na gapo an nahulog hali sa taas ngunyan na tag-uran",Landslide,Medium,bikol
+Naestrangle ang daloy ng tubig sa kanal kaya nagbabaha,Flooding,Medium,tagalog
+"Importante po ito, May buntis na manganganak na kailangan ng agad na sasakyan papunta ospital pakiusap.",Medical,High,tagalog
+Alam ko po na marami kayong trabaho pero Ang mga kabataan ay nagtitipon sa gabi at may ingay na naririnig umaasa po kaming maaksyunan ito.,Security,Medium,tagalog
+"Pakiusap sana ay tulungan kami, May nagtatalik ng barilan sa aming lugar takot na ang mga residente nangyari ito kanina pa.",Security,High,tagalog
+May pagguho ng lupa sa estero naharang na ang daloy ng tubig,Landslide,High,tagalog
+"Mahal na barangay tanggapan, Hindi gumagana ang traffic light sa intersection mapanganib kailangan ng agad na aksyon.",Road Hazard,Medium,tagalog
+"Importante po ito, Ang mga linya ay magkadikit na sa kalye mapanganib sa mga motorsiklo kailangan na talaga ng tulong.",Power Hazard,Medium,tagalog
+Ang mga alagang aso ng kapitbahay ay palaging umaatake sa mga dumaan,Animal,Medium,tagalog
+Nasunog ang apat na bahay sa aming sityo kailangan ng rescue salamat po.,Fire,High,tagalog
+"Nagtatanong po kung may aksyon na, Ang sewage system ay sumabog at nagdulot ng polusyon sa mga bahay ito ay nangyari ngayon.",Infrastructure,High,tagalog
+"May nangagaw nin bag sa samuyang lugar, dakul na beses na ining nangyari",Security,High,bikol
+"Gusto ko sanang i-report na Igwa nin mga tawong nasyerak sa harong huli sa baha, dai makaluwas naglalaom kami na maaksyunan ini.",Flooding,High,bikol
+Nag aalala po kami dahil Nakita ko ang isang suspetsa na taong nagtatago sa likod ng building kailangan na talaga ng tulong.,Security,High,tagalog
+"Importante po ito, Bumagsak ang retaining wall ng kalsada sa bundok napit ang mga sasakyan umaasa po kaming maaksyunan ito.",Infrastructure,High,tagalog
+Biglang nahulog an dakulang parte kan bukid harani sa mga harong kaipuhan nin tulong ngunyan.,Landslide,High,bikol
+Nag aalala po kami dahil Nagliliyab ang bahay ng aming kababarangay kailangan ng fire truck salamat po.,Fire,High,tagalog
+"Aram ko na dakul kamong trabaho pero An linya sa kalsada dai na naheheling, kaipuhan bagong pintura pakiusap.",Road Hazard,Low,bikol
+Nag aalala po kami dahil Naputol ang high tension wire at bumagsak sa palengke kailangan ng agad na aksyon.,Power Hazard,High,tagalog
+"Pakiusap sana ay tulungan kami, Ang mga bangketa sa aming lugar ay hindi na magamit sira na lahat",Infrastructure,Medium,tagalog
+"Importante po ito, May nakita kaming bitak sa lupa sa mataas na lugar posibleng magguho pakiusap.",Landslide,Medium,tagalog
+Nakita ko ang usok mula sa bahay na walang tagaroon posibleng susunog maraming salamat po.,Fire,High,tagalog
+"Importante po ito, Tinamaan ng poste ng kuryente ang isang lalaki unconscious na siya kailangan na talaga ng tulong.",Medical,High,tagalog
+"Dai nagfufunction an traffic light sa interseksyon, peligroso puwede daw kamong tumabang?",Road Hazard,Medium,bikol
+May bata na nalunod sa mababaw na tubig kailangan agad ng medikal pakiusap.,Medical,High,tagalog
+"Nagtatanong po kung may aksyon na, Sumonod ang sunog mula sa isang bahay patungo sa mga kapitbahay namin kailangan ng agad na aksyon.",Fire,High,tagalog
+Alam ko po na marami kayong trabaho pero Nahulog ang malaking poste sa gitna ng highway pakiayos na pakiusap.,Road Hazard,High,tagalog
+"Importante po ito, Ang retaining wall sa aming lugar ay gumuho na kailangan ng ayos umaasa po kaming maaksyunan ito.",Structural,High,tagalog
+"Pakiusap sana ay tulungan kami, Maraming residente ang nagsuka at nagtatae matapos sa fiesta salo salo maraming salamat po.",Food,High,tagalog
+"Pakiusap sana ay tulungan kami, Nahulog ang malaking poste sa gitna ng highway pakiayos na",Road Hazard,High,tagalog
+May bata na binugbog kailangan ng medical attention agad pakiusap.,Medical,High,tagalog
+Maraming bitak ang pader ng aming eskwelahan posibleng delikado salamat po.,Structural,Medium,tagalog
+May konting guho ng lupa sa tabi ng kalsada maliit lang naman pakiusap.,Landslide,Low,tagalog
+Nag aalala po kami dahil Naputol ang power line at bumagsak sa kalsada delikado sa mga tao pakiusap.,Utility,High,tagalog
+Nagguho ang lupa sa gilid ng kalsada sa bundok peligroso sa mga sasakyan nangyari ito kanina pa.,Landslide,High,tagalog
+Alam ko po na marami kayong trabaho pero May nagtatalik ng away ng grupo sa kanto ng aming barangay mapanganib umaasa po kaming maaksyunan ito.,Security,High,tagalog
+May tao na sinagasaan ng sasakyan nasaktan at kailangan ng rescue sana ay tulungan ninyo kami.,Medical,High,tagalog
+Nasunog ang apat na bahay sa aming sityo kailangan ng rescue sana ay tulungan ninyo kami.,Fire,High,tagalog
+Bukas na ang manhole cover sa gitna ng daan nakita ko na ang ilang nadaanan sana ay tulungan ninyo kami.,Road Hazard,High,tagalog
+Alam ko po na marami kayong trabaho pero Nasira ang pangunahing kalsada at hindi na madaraanan ng mga sasakyan ito ay nangyari ngayon.,Infrastructure,High,tagalog
+Nag aalala po kami dahil Ang street light sa aming lugar ay naputulan ng ilaw gusto ko lang ireport ito ay nangyari ngayon.,Utility,Low,tagalog
+Alam ko po na marami kayong trabaho pero Maraming adik na nakikita sa aming lugar gabi gabi kailangan ng aksyon nangyari ito kanina pa.,Security,Medium,tagalog
+Nahulog an daga hali sa mataas na parte pasiring sa mga harong sa ibaba,Landslide,High,bikol
+"Mahal na barangay tanggapan, May matanda na hirap huminga sinasabing masakit ang dibdib niya",Medical,High,tagalog
+"Importante po ito, May nag-aaway at gumagamit ng armas sa palengke kailangan ng pulis agad",Security,High,tagalog
+"Aram ko na dakul kamong trabaho pero May residenteng may mataas na hilanat, kaipuhan nin check-up kaipuhan na gayod nin tabang.",Medical,Medium,bikol
+May gurang na babaeng biglang naluya sa luwas kan harong niya salamat.,Medical,High,bikol
+"Nagtatanong po kung may aksyon na, Nasira ang kalsada matapos ang baha may malaking butas sa daan ito ay nangyari ngayon.",Road Hazard,High,tagalog
+"Nahulog an transformer harani sa palengke, may kalayong naluluwas naglalaom kami na maaksyunan ini.",Power Hazard,High,bikol
+Naanod an samuyang sasakyan huli sa kusog kan sulog nin tubig salamat.,Flooding,High,bikol
+"Nag-aalala kami huli ta May nahulog na buhay na alambre sa kalsada, peligroso sa gabos pakiusap.",Power Hazard,High,bikol
+"Aram ko na dakul kamong trabaho pero Nahulog sa hagdan an sarong residente, dai na makahiro",Medical,High,bikol
+"Importante po ito, Ang waiting shed sa kanto ay gumuguho na kailangan ng bagong istruktura nangyari ito kanina pa.",Structural,Medium,tagalog
+"Naghahapot ako kun igwa nang aksyon, Gusto ko sanang i-report na an drainage sa samuyang sityo puno nin basura naglalaom kami na maaksyunan ini.",Infrastructure,Low,bikol
+Nag-aalala kami huli ta Naanod an samuyang sasakyan huli sa kusog kan sulog nin tubig kaipuhan nin tulong ngunyan.,Flooding,High,bikol
+Nag aalala po kami dahil Walang tubig kami tuwing umaga dapat ay may tubig umaasa po kaming maaksyunan ito.,Utility,Medium,tagalog
+"Importante po ito, Ang overpass ay may malaking bitak at delikado na sa mga gumagamit maraming salamat po.",Infrastructure,High,tagalog
+May ulol na aso sa aming lugar kinagat na ang tatlong tao kailangan tulungan nangyari ito kanina pa.,Animal,High,tagalog
+Ang aming kapit bahay ay matagal nang hindi kumakain kailangan ng tulong salamat po.,Medical,Medium,tagalog
+May nahulog na container van sa kalsada delikado sa mga sasakyan maraming salamat po.,Road Hazard,High,tagalog
+Nahulog an poste nin kuryente sa atubangan kan samuyang harong salamat.,Utility,High,bikol
+"Pakiusap sana ay tulungan kami, Ang gusali sa aming lugar ay may malalaking bitak sa pader mapanganib kailangan na talaga ng tulong.",Structural,High,tagalog
+"Pakiusap sana ay tulungan kami, Bumagsak ang lupa mula sa tabi ng kalsada naharang na ang daanan maaari ba kayong tumulong?",Road Hazard,High,tagalog
+May nagrereklamo nin sakit nin payo huli sa kainit ngunyan ini nangyari ngunyan.,Medical,Low,bikol
+"Importante po ito, Nagguho ang lupa sa gilid ng kalsada sa bundok peligroso sa mga sasakyan",Landslide,High,tagalog
+Alam ko po na marami kayong trabaho pero Ang aking kapitbahay ay nagrereklamo ng paulit ulit na pagnanakaw,Security,Medium,tagalog
+"Igwa nin pagkagaba kan daga sa itaas kan bukid, nakaharang an dalan pasiring digdi naglalaom kami na maaksyunan ini.",Landslide,High,bikol
+"Pakiusap sana ay tulungan kami, Naputol ang high tension wire at bumagsak sa palengke sana ay tulungan ninyo kami.",Power Hazard,High,tagalog
+Naputol ang gas line malapit sa mga bahay mapanganib sa pagsabog pakiusap.,Utility,High,tagalog
+"Mahal na barangay tanggapan, Gusto ko lang ireport na maluwag ang takip ng drainage sa aming daan salamat po.",Utility,Low,tagalog
+Nag aalala po kami dahil Ang fence ng barangay basketball court ay tilt na posibleng mabuwal ito ay nangyari ngayon.,Structural,Medium,tagalog
+"Mahal na barangay tanggapan, Ang lumang gusali ay gumuho na sa isang parte kailangan ng rescue",Structural,High,tagalog
+Nag aalala po kami dahil Ang kalsada sa aming barangay ay lubak lubak na mapanganib sa motorsiklo,Road Hazard,Medium,tagalog
+"May nag-iiriwal-wal asin naggagamit nin armas sa palengke, kaipuhan tulos nin pulis",Security,High,bikol
+"Apat na harong an nasunog sa samuyang sityo, kaipuhan nin rescue puwede daw kamong tumabang?",Fire,High,bikol
+Alam ko po na marami kayong trabaho pero Maraming residente ang hindi kumakain dahil sa tagtuyot wala silang pagkain nangyari ito kanina pa.,Food,Medium,tagalog
+Ang wiring sa isang bahay ay luma na at baka magkorslot kailangan na talaga ng tulong.,Power Hazard,Medium,tagalog
+"Pakiusap tabangan kami, Naghihilaw an baha sa mababang parte kan barangay kaipuhan na gayod nin tabang.",Flooding,Medium,bikol
+"Gusto ko sanang i-report na An tubig na ininom kan mga aki igwa nin kakaibang kahamis, tibaad kontaminado",Food,High,bikol
+Gusto ko sanang i-report na An tulay sa samuyang barangay hababa na asin tibaad dai na matibay dakul na salamat.,Structural,Medium,bikol
+Gusto ko sanang i-report na an samuyang poste medyo naghihiro na puwede daw kamong tumabang?,Power Hazard,Low,bikol
+"Nag-aalala kami huli ta Nahulog an dakulang gapo hali sa bukid, nakaharang sa dalan",Road Hazard,High,bikol
+"Naghahapot ako kun igwa nang aksyon, Dakulang sunog sa palengke, nagdadakula pa an kalayo, kaipuhan nin tabang ini nangyari ngunyan.",Fire,High,bikol
+May bata na nalunod sa mababaw na tubig kailangan agad ng medikal sana ay tulungan ninyo kami.,Medical,High,tagalog
+Nag aalala po kami dahil Konting dumi sa kalsada pagkatapos ng pista gusto ko lang ireport,Road Hazard,Low,tagalog
+"Pakiusap sana ay tulungan kami, Nagsimula sa kalan ang sunog mabilis na kumalat sa ibang bahay kailangan ng agad na aksyon.",Fire,High,tagalog
+"Naghahapot ako kun igwa nang aksyon, Nagbaha na sa samuyang harong, gabos na gamit nalubugan na dakul na salamat.",Flooding,High,bikol
+"Nagtatanong po kung may aksyon na, Ang baha ay umabot na sa bubungan ng mababang bahay dito sa amin maaari ba kayong tumulong?",Flooding,High,tagalog
+Nag-aalala kami huli ta Dakul na nagrereklamo nin helang na tibaad food poisoning,Medical,Medium,bikol
+May maliit na sunog sa vegetable stall nabugaw na pero may natitira kailangan na talaga ng tulong.,Fire,Medium,tagalog
+"Aram ko na dakul kamong trabaho pero Naputol an pangenot na tubo nin tubig, gabos kami daing tubig puwede daw kamong tumabang?",Utility,High,bikol
+"Naghahapot ako kun igwa nang aksyon, Nagaba an kalsada pagkatapos kan baha, igwa nin dakulang lungag pakiusap.",Road Hazard,High,bikol
+May grupong nangongolekta nin lagay sa mga negosyante sa palengke naglalaom kami na maaksyunan ini.,Security,Medium,bikol
+Naaksidente ang aking kapitbahay kailangan ng agad na tulong medikal sana ay tulungan ninyo kami.,Medical,High,tagalog
+"Aram ko na dakul kamong trabaho pero Nagkakalayo an bodega sa gilid kan samuyang harong, kaipuhan nin BFP tabangan niyo kami tabi.",Fire,High,bikol
+Nag aalala po kami dahil Ang guardrail sa mataas na daan ay sira na at mapanganib nangyari ito kanina pa.,Road Hazard,Medium,tagalog
+"Nagtatanong po kung may aksyon na, Ang tulay ay may malaking butas na sa gitna delikado sa mga bata pakiusap.",Infrastructure,Medium,tagalog
+"Nag-aalala kami huli ta May tawong nawaran nin malay sa kalsada, kaipuhan nin ambulansya naglalaom kami na maaksyunan ini.",Medical,High,bikol
+"Nag-aalala kami huli ta Nahulog an konting daga sa drainage, gusto ko sanang i-report salamat.",Landslide,Low,bikol
+Bumagsak ang lupa mula sa tabi ng kalsada naharang na ang daanan,Road Hazard,High,tagalog
+"Pakiusap sana ay tulungan kami, Ang bahay ng aming kapitbahay ay malapit nang bumagsak kailangan lumikas sana ay tulungan ninyo kami.",Structural,High,tagalog
+Ang fence ng barangay basketball court ay tilt na posibleng mabuwal,Structural,Medium,tagalog
+"Nahulog an daga hali sa gilid kan kalsada, nakaharang na an dalan tabangan niyo kami tabi.",Road Hazard,High,bikol
+Bumagsak ang malaking bato mula sa bundok naharang ang daan,Road Hazard,High,tagalog
+Alam ko po na marami kayong trabaho pero Ang drainage system ay sira na kaya palaging nagbabaha salamat po.,Flooding,Medium,tagalog
+Nag-aalala kami huli ta Dakul na gapo an nahulog hali sa taas ngunyan na tag-uran kaipuhan nin tulong ngunyan.,Landslide,Medium,bikol
+"Mahal na tanggapan kan barangay, May gurang na babaeng biglang naluya sa luwas kan harong niya",Medical,High,bikol
+"Importante po ito, May suspetsa na dengue outbreak sa aming barangay maraming nagrereklamo ito ay nangyari ngayon.",Medical,Medium,tagalog
+"Naghali sa kalan an sunog, luway-luway nag-aabot sa ibang harong",Fire,High,bikol
+"Pakiusap sana ay tulungan kami, May nang-aagaw ng bag sa aming lugar maraming beses nang nangyari sana ay tulungan ninyo kami.",Security,High,tagalog
+Naanod an samuyang sasakyan huli sa kusog kan sulog nin tubig puwede daw kamong tumabang?,Flooding,High,bikol
+"Mahal na barangay tanggapan, Mga bata at matatanda naipit sa baha kailangan ng rescue",Flooding,High,tagalog
+Dalawang bahay na naanod sa baha kailangan agad ng tulong sana ay tulungan ninyo kami.,Flooding,High,tagalog
+Nasira ang kalsada matapos ang baha may malaking butas sa daan kailangan ng agad na aksyon.,Road Hazard,High,tagalog
+Gusto ko lang ireport na Gusto ko lang ireport na maraming lamok sa aming lugar kailangan ng agad na aksyon.,Medical,Low,tagalog
+May nakulong na tao sa loob ng bahay hindi makalabas dahil sa baha,Flooding,High,tagalog
+"May sadit na pagkagaba kan daga sa gilid kan kalsada, sadit sana man naglalaom kami na maaksyunan ini.",Landslide,Low,bikol
+Nag aalala po kami dahil Nalaglag ang overpass bridge component sa kalsada delikado sa mga sasakyan umaasa po kaming maaksyunan ito.,Road Hazard,High,tagalog
+Kinagat ng aso ang isang batang nasa daan kailangan ng medikal na tulong kailangan ng agad na aksyon.,Animal,High,tagalog
+Alam ko po na marami kayong trabaho pero Biglang bumagsak ang kisame ng paaralan may mga bata sa loob,Structural,High,tagalog
+"Nagtatanong po kung may aksyon na, Nagko-korslot ang wiring sa poste sa labas ng aming bahay maaari ba kayong tumulong?",Utility,Medium,tagalog
+Nag aalala po kami dahil May nang-aagaw ng bag sa aming lugar maraming beses nang nangyari,Security,High,tagalog
+"Nagtatanong po kung may aksyon na, Ang gusali sa aming lugar ay may malalaking bitak sa pader mapanganib maraming salamat po.",Structural,High,tagalog
+"Pakiusap tabangan kami, An linya sa kalsada dai na naheheling, kaipuhan bagong pintura kaipuhan na gayod nin tabang.",Road Hazard,Low,bikol
+Alam ko po na marami kayong trabaho pero Ang mga pusa at aso sa aming lugar ay walang bakuna dapat ayusin,Animal,Low,tagalog
+"Importante po ito, Kailangan ng libreng medical mission ang aming barangay maraming pasyente ito ay nangyari ngayon.",Medical,Medium,tagalog
+Maliit lang ang baha sa kalsada pero gusto lang ireport nangyari ito kanina pa.,Flooding,Low,tagalog
+Maraming tao ang nagkasakit matapos kumain sa canteen ng barangay maaari ba kayong tumulong?,Food,High,tagalog
+"Mahal na barangay tanggapan, May matanda na hirap huminga sinasabing masakit ang dibdib niya maaari ba kayong tumulong?",Medical,High,tagalog
+"Gusto ko sanang i-report na Gaba an mga manhole cover sa samuyang lugar, peligroso sa nagdadalagan",Infrastructure,Medium,bikol
+"Dakul na basura sa kanal, ini an dahilan kan pagbaha digdi dakul na salamat.",Flooding,Medium,bikol
+Lumagpas na ang baha sa baywang antas kailangan na ng pagtulong,Flooding,High,tagalog
+Gusto ko lang ireport na Konting tubig sa labas ng bahay wala naman malaking epekto sana ay tulungan ninyo kami.,Flooding,Low,tagalog
+Gusto ko lang ireport na May sunog sa talipapa mabilis kumakalat dahil sa hangin kailangan na talaga ng tulong.,Fire,High,tagalog
+Nagtaas ng babala ang weather bureau malakas pang ulan darating,Flooding,High,tagalog
+Maraming asong gala sa aming lugar nakakadismaya at delikado sa mga bata sana ay tulungan ninyo kami.,Animal,Medium,tagalog
+"Pakiusap sana ay tulungan kami, Ang lumang gusali ay gumuho na sa isang parte kailangan ng rescue kailangan ng agad na aksyon.",Structural,High,tagalog
+"Nagtatanong po kung may aksyon na, Malaking sunog sa lumber yard apoy papalaki na pakiusap.",Fire,High,tagalog
+Bumagsak ang malaking bato mula sa bundok naharang ang daan kailangan ng agad na aksyon.,Road Hazard,High,tagalog
+"Mahal na barangay tanggapan, Nasira ang tulay dahil sa lakas ng baha hindi na madaraanan umaasa po kaming maaksyunan ito.",Flooding,High,tagalog
+Alam ko po na marami kayong trabaho pero May electric shock ang isang bata sa tapat ng aming bahay ito ay nangyari ngayon.,Power Hazard,High,tagalog
+"Nagtatanong po kung may aksyon na, May konting guho ng lupa sa tabi ng kalsada maliit lang naman maraming salamat po.",Landslide,Low,tagalog
+Gusto ko lang ireport na Walang tubig kami tuwing umaga dapat ay may tubig pakiusap.,Utility,Medium,tagalog
+"Pakiusap sana ay tulungan kami, Ang pintuan ng barangay basketball court ay sira na hindi masara sana ay tulungan ninyo kami.",Infrastructure,Low,tagalog
+Ang mga bangketa sa aming lugar ay hindi na magamit sira na lahat nangyari ito kanina pa.,Infrastructure,Medium,tagalog
+"May ayam na daing kagsadiri na nagkakagat nin mga tawo sa samuyang lugar, peligroso",Animal,High,bikol
+"Mahal na barangay tanggapan, Sira na ang street light sa aming kalsada mapanganib sa gabi ito ay nangyari ngayon.",Utility,Medium,tagalog
+Bumagsak ang lupa mula sa tabi ng kalsada naharang na ang daanan sana ay tulungan ninyo kami.,Road Hazard,High,tagalog
+Gusto ko lang ireport na May maliit na sunog sa kangkungan sa likod ng barangay hall sana ay tulungan ninyo kami.,Fire,Medium,tagalog
+"Naghahapot ako kun igwa nang aksyon, Nagkakalayo an bodega sa gilid kan samuyang harong, kaipuhan nin BFP naglalaom kami na maaksyunan ini.",Fire,High,bikol
+"Pakiusap sana ay tulungan kami, Maraming beses nang nagnakaw ng gulay sa aming sityo kailangan ng aksyon sana ay tulungan ninyo kami.",Security,Medium,tagalog
+"Importante po ito, Gusto ko lang ireport na may nagbebenta ng expired na pagkain sa tindahan",Food,Low,tagalog
+"Mahal na barangay tanggapan, Biglang natumba ang lalaki sa kalsada walang makatulong sa kanya kailangan ng agad na aksyon.",Medical,High,tagalog
+"Importante ini, Naghali sa kalan an sunog, luway-luway nag-aabot sa ibang harong kaipuhan nin tulong ngunyan.",Fire,High,bikol
+Nag aalala po kami dahil Ang retaining wall sa aming lugar ay gumuho na kailangan ng ayos maaari ba kayong tumulong?,Structural,High,tagalog
+Alam ko po na marami kayong trabaho pero Ang baha ay umabot na sa bubungan ng mababang bahay dito sa amin,Flooding,High,tagalog
+"Gusto ko sanang i-report na An gusali sa samuyang lugar igwa nin dakulang pitak sa lanob, peligroso kaipuhan na gayod nin tabang.",Structural,High,bikol
+"Dakulang sunog sa palengke, nagdadakula pa an kalayo, kaipuhan nin tabang pakiusap.",Fire,High,bikol
+"Nagtatanong po kung may aksyon na, May tao na sinagasaan ng sasakyan nasaktan at kailangan ng rescue",Medical,High,tagalog
+"Nagtatanong po kung may aksyon na, Ang sidewalk sa aming lugar ay puno na ng mga nakaradyong halaman maraming salamat po.",Road Hazard,Low,tagalog
+Alam ko po na marami kayong trabaho pero Maliit na baha sa ilalim ng tulay gusto lang malaman ng barangay nangyari ito kanina pa.,Flooding,Low,tagalog
+"Nag-aalala kami huli ta Nagbaha na sa samuyang harong, gabos na gamit nalubugan na puwede daw kamong tumabang?",Flooding,High,bikol
+May pinaghihinalaang drug den sa katabing bahay kailangan ng imbestigasyon sana ay tulungan ninyo kami.,Security,Medium,tagalog
+Ang overpass ay may malaking bitak at delikado na sa mga gumagamit nangyari ito kanina pa.,Infrastructure,High,tagalog
+Gusto ko lang ireport na Ang tulay sa aming lugar ay may malaking bitak mapanganib ang pagtawid kailangan na talaga ng tulong.,Structural,High,tagalog
+"Nagtatanong po kung may aksyon na, Naaksidente ang aking kapitbahay kailangan ng agad na tulong medikal",Medical,High,tagalog
+Gusto ko lang ireport na Ang kuryente ay lumalagyan ng apoy sa poste malapit sa paaralan salamat po.,Power Hazard,High,tagalog
+"Naghahapot ako kun igwa nang aksyon, Nasunog an mga daan na papel sa luwas kan harong, napalong na kan tubig",Fire,Low,bikol
+Gusto ko lang ireport na Ang mga linya ng kuryente sa aming lugar ay masyadong mababa delikado pakiusap.,Power Hazard,Medium,tagalog
+Alam ko po na marami kayong trabaho pero Nasira ang kalsada matapos ang baha may malaking butas sa daan,Road Hazard,High,tagalog
+"Nagtatanong po kung may aksyon na, Bumabaha ang kalsada at may peligro sa mga motorista",Flooding,Medium,tagalog
+"Pakiusap sana ay tulungan kami, May nakita kaming mga bato sa kalsada baka nanggaling sa bundok",Landslide,Low,tagalog
+"Importante ini, Naputol an linya nin kuryente asin nahulog sa kalsada, peligroso dakul na salamat.",Utility,High,bikol
+"Importante po ito, Ang fence ng barangay basketball court ay tilt na posibleng mabuwal pakiusap.",Structural,Medium,tagalog
+"Mahal na barangay tanggapan, Walang tubig na iniinom sa aming lugar tatlong araw na ito umaasa po kaming maaksyunan ito.",Utility,High,tagalog
+Nasusunog ang basura sa likod ng kalsada may usok na lumalagay maraming salamat po.,Fire,Medium,tagalog
+"Nag-aalala kami huli ta Kinagat kan ayam an sarong aki na yaon sa dalan, kaipuhan nin tabang medikal pakiusap.",Animal,High,bikol
+"Nag-aalala kami huli ta An tulay sa samuyang lugar igwa nin dakulang pitak, peligroso baklayon",Structural,High,bikol
+Nag aalala po kami dahil Maraming tao ang nagkasakit matapos kumain sa canteen ng barangay,Food,High,tagalog
+"May tindahan sa palengke na nagbabakal nin maraot na karne, kaipuhan susugon naglalaom kami na maaksyunan ini.",Food,Medium,bikol
+"Mataas na an baha sa samuyang lugar, halos sa daghan na kan mga tawo puwede daw kamong tumabang?",Flooding,High,bikol
+"Mahal na barangay tanggapan, Nahulog ang malaking sanga ng puno sa kalsada naputol ang linya ng kuryente ito ay nangyari ngayon.",Road Hazard,High,tagalog
+"Aram ko na dakul kamong trabaho pero Naghali sa kalan an sunog, luway-luway nag-aabot sa ibang harong kaipuhan nin tulong ngunyan.",Fire,High,bikol
+"Naghahapot ako kun igwa nang aksyon, Nasunog an mga daan na papel sa luwas kan harong, napalong na kan tubig ini nangyari ngunyan.",Fire,Low,bikol
+Nasunog ang apat na bahay sa aming sityo kailangan ng rescue kailangan ng agad na aksyon.,Fire,High,tagalog
+"Pakiusap sana ay tulungan kami, Ang tubig na ininom ng mga bata ay may kakaibang amoy posibleng kontaminado salamat po.",Food,High,tagalog
+Gusto ko sanang i-report na Gaba na an drainage kaya parati kaming binabaha tabangan niyo kami tabi.,Flooding,Medium,bikol
+Nag aalala po kami dahil Umabot na ang baha sa loob ng classroom at opisina ng barangay,Flooding,High,tagalog
+Kailangan ng food assistance ang maraming pamilya sa aming barangay,Food,Medium,tagalog
+"Pakiusap tabangan kami, May konting aso hali sa kalan kan kataed, dai naman grabe",Fire,Low,bikol
+"Nagtatanong po kung may aksyon na, Gusto ko lang ireport na baka kailangan na ng bagong tubig pipes dito",Utility,Low,tagalog
+"Importante po ito, Naanod ang sasakyan namin dahil sa lakas ng agos ng tubig ito ay nangyari ngayon.",Flooding,High,tagalog
+Nag aalala po kami dahil May pagguho ng lupa sa estero naharang na ang daloy ng tubig kailangan ng agad na aksyon.,Landslide,High,tagalog
+"Nagtatanong po kung may aksyon na, Ang mga sign sa kalsada ay halos hindi na nababasa kailangan ng kapalit",Infrastructure,Low,tagalog
+Gusto ko lang ireport na Nakita ko ang usok mula sa bahay na walang tagaroon posibleng susunog sana ay tulungan ninyo kami.,Fire,High,tagalog
+"Mahal na barangay tanggapan, Walang tubig na iniinom sa aming lugar tatlong araw na ito maraming salamat po.",Utility,High,tagalog
+Nag aalala po kami dahil Ang LPG tank ay naputok at nagdulot ng sunog sa paligid maraming salamat po.,Fire,High,tagalog
+Ang lumang barangay hall ay may mga bitak na sa pader kailangan na suriin nangyari ito kanina pa.,Structural,Medium,tagalog
+"Mahal na barangay tanggapan, May nagtatalik ng away ng grupo sa kanto ng aming barangay mapanganib kailangan ng agad na aksyon.",Security,High,tagalog
+Alam ko po na marami kayong trabaho pero Maraming daga na lumalabas sa aming lugar mula nang bumaha,Animal,Medium,tagalog
+"Pakiusap sana ay tulungan kami, May electric shock ang isang bata sa tapat ng aming bahay nangyari ito kanina pa.",Power Hazard,High,tagalog
+Bumagsak ang malaking bato mula sa bundok tumama sa bahay ng kapitbahay salamat po.,Landslide,High,tagalog
+"Nag-aalala kami huli ta May nag-iiriwal-wal asin naggagamit nin armas sa palengke, kaipuhan tulos nin pulis",Security,High,bikol
+Nag aalala po kami dahil May bata na binugbog kailangan ng medical attention agad kailangan na talaga ng tulong.,Medical,High,tagalog
+"Aram ko na dakul kamong trabaho pero May nangagaw nin bag sa samuyang lugar, dakul na beses na ining nangyari tabangan niyo kami tabi.",Security,High,bikol
+"Mahal na barangay tanggapan, May bata na nalunod sa mababaw na tubig kailangan agad ng medikal",Medical,High,tagalog
+Gusto ko lang ireport na Ang bakod ng parke sa amin ay may sira na dapat na ayusin,Structural,Low,tagalog
+"Mahal na barangay tanggapan, Nagkaroon ng seizure ang aking kapit bahay hindi siya makapag-abot ng tulong ito ay nangyari ngayon.",Medical,High,tagalog
+Alam ko po na marami kayong trabaho pero Ang sewage system ay sumabog at nagdulot ng polusyon sa mga bahay salamat po.,Infrastructure,High,tagalog
+Alam ko po na marami kayong trabaho pero Ang ilaw sa aming sityo ay kumukurap na baka may problema sa linya sana ay tulungan ninyo kami.,Power Hazard,Low,tagalog
+"Importante po ito, Ang signage sa kanto ay nahulog na kailangan ng kapalit kailangan na talaga ng tulong.",Road Hazard,Low,tagalog
+Alam ko po na marami kayong trabaho pero May food poisoning na naranasan ang maraming residente mula sa iisang tindahan sana ay tulungan ninyo kami.,Food,High,tagalog
+"Importante po ito, Maraming pasyente ang nagrereklamo ng sakit na posibleng food poisoning kailangan na talaga ng tulong.",Medical,Medium,tagalog
+"Nag-aalala kami huli ta An gilid kan kalsada sa bukid naluluwag na, tibaad maggaba puwede daw kamong tumabang?",Landslide,Medium,bikol
+"Pakiusap sana ay tulungan kami, Bumabaha ang kalsada at may peligro sa mga motorista salamat po.",Flooding,Medium,tagalog
+Maraming pamilya ang nawalan ng tirahan dahil sa malaking baha,Flooding,High,tagalog
+Gusto ko lang ireport na May bata na binugbog kailangan ng medical attention agad pakiusap.,Medical,High,tagalog
+Naputol ang power line at bumagsak sa kalsada delikado sa mga tao maraming salamat po.,Utility,High,tagalog
+"Nagtatanong po kung may aksyon na, Bumagsak ang malaking bahagi ng tulay sa aming lugar delikado maraming salamat po.",Infrastructure,High,tagalog
+"Nagtatanong po kung may aksyon na, Kailangan ng vitamins ang mga bata sa aming purok",Medical,Low,tagalog

@@ -1,4 +1,5 @@
 torch
+torchvision
 transformers
 fastapi
 uvicorn
@@ -7,3 +8,5 @@ scikit-learn
 numpy
 python-multipart
 httpx
+pillow
+python-dotenv

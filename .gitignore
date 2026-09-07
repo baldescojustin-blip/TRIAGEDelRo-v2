@@ -4,6 +4,8 @@
 node_modules/
 .env
 .env.*
+# ...but the safe, secret-free template should still be committed:
+!.env.example
 *.log
 *.tmp
 *.cache
@@ -43,7 +45,11 @@ tokenizer.json
 
 # datasets
 data/
+raw_data/
 *.csv
+
+# debug/training logs
+TRIAGEDelRo_backend/*_log*.txt
 
 # =========================
 # 🔹 NODE / BACKEND
@@ -58,6 +64,11 @@ yarn.lock
 .packages
 .pub/
 build/
+
+# =========================
+# 🔹 NETLIFY (local CLI state)
+# =========================
+.netlify/
 
 # =========================
 # 🔹 OS FILES

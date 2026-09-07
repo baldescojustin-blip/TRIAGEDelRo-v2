@@ -1,0 +1,207 @@
+--- Flooding / High ---
+  - Nagbaha na sa samuyang harong, gabos na gamit nalubugan na
+  - Igwa nin mga tawong naistak sa harong huli sa baha, dai makaluwas
+  - Mataas na an baha sa samuyang lugar, halos sa daghan na kan mga tawo
+  - Dakul na pamilya an nagkaipit sa baha, kaipuhan nin rescue tulos
+  - Naanod an samuyang sasakyan huli sa kusog kan sulog nin tubig
+  - Biglang nag kusog an baha, nakaabot na sa laog kan harong mi
+  - Na gaba an tulay huli sa kusog kan baha, dai na maagihan
+  - tabang makusogon ang uran nag laog na ang baha sa harong mi
+
+--- Flooding / Medium ---
+  - Sadit sana an baha pero naghihilaw na, kaipuhan bantayan
+  - Dakul na basura sa kanal, ini an dahilan kan pagbaha digdi
+  - Naghihilaw an baha sa kalsada tuwing nag-uuran
+  - An salog digdi sa amon parati nang nag-aalsa pag kusog an uran
+  - Naghihilaw an baha sa mababang parte kan barangay
+  - Gaba na an drainage kaya parati kaming binabaha
+
+--- Flooding / Low ---
+  - Sadit sanang baha sa kalsada, gusto ko sanang i-report
+  - Nabasa sana an atubangan kan harong, dai naman grabe
+  - May konting tubig sa gilid kan tulay huli sa uran
+  - Naghihilaw nin dikit an kanal pero dai pa grabe
+
+--- Medical / High ---
+  - May nasakitan sa samuyang kataed, kaipuhan tulos nin tabang
+  - May tawong nawaran nin malay sa kalsada, kaipuhan nin ambulansya
+  - Naaksidente an sakuyang kataed, kaipuhan nin dagos na tabang medikal
+  - May aking binugbog, kaipuhan nin atensyon medikal ngunyan man
+  - Nahulog sa hagdan an sarong residente, dai na makahiro
+  - May gurang na babaeng biglang naluya sa luwas kan harong niya
+
+--- Medical / Medium ---
+  - Dakul na residente an naghehelang, tibaad dengue, kaipuhan nin fumigation
+  - Dakul na aki an may lagnat asin ubo sa samuyang purok
+  - Dakul na nagrereklamo nin helang na tibaad food poisoning
+  - May residenteng may mataas na hilanat, kaipuhan nin check-up
+  - An gurang sa kanto igwa nin daan nang samad na dai naghahayad
+
+--- Medical / Low ---
+  - Gusto ko sanang i-report na dakul na lamok sa samuyang lugar
+  - Kaipuhan nin bitamina an mga aki sa samuyang purok
+  - May nagrereklamo nin sakit nin payo huli sa kainit ngunyan
+
+--- Fire / High ---
+  - May sulo sa harong kan kataed mi, tabangan man kami
+  - Nagkakalayo an bodega sa gilid kan samuyang harong, kaipuhan nin BFP
+  - Dakulang sulo sa saod, nagdadakula pa an kalayo, kaipuhan nin tabang
+  - Apat na harong an na sulo sa samuyang sityo, kaipuhan nin rescue
+  - Nagkalayo an pabrika, an kalayo nag-aabot na sa atop
+  - Naghali sa kalan an sulo, luway-luway nag-aabot sa ibang harong
+
+--- Fire / Medium ---
+  - May naheling na aso sa dumpsite, tibaad may nagkakalayo na basura
+  - Nagkakalayo an basura sa likod kan kalsada, may aso na nagluluwas
+  - May sadit na sunog sa vegetable stall, nabugaw na pero igwa pang natada
+  - Nagkalayo an sadit na pader kan harong, kontrolado na pero kaipuhan pa suhayan
+
+--- Fire / Low ---
+  - Nasunog an mga alang na dahon sa likod kan eskwelahan, nabugaw na
+  - May konting aso hali sa kalan kan kataed, dai naman grabe
+  - Nasunog an mga daan na papel sa luwas kan harong, napalong na kan tubig
+
+--- Road Hazard / High ---
+  - Nahulog an kahoy sa tahaw kan tinampo, dai na madadaanan
+  - Nahulog an dakulang gapo hali sa bukid, nakaharang sa dalan
+  - Nahulog an dakulang poste sa tahaw kan highway, ayuson na tabi
+  - Nagaba an kalsada pagkatapos kan baha, igwa nin dakulang lungag
+  - Nahulog an daga hali sa gilid kan kalsada, nakaharang na an dalan
+
+--- Road Hazard / Medium ---
+  - Igwa nin dakulang lungag sa kalsada na peligroso, orog na sa banggi
+  - Gaba na an speed bump sa atubangan kan eskwelahan, peligroso sa mga aki
+  - Dai nagfufunction an traffic light sa interseksyon, peligroso
+  - Dakul na lungag sa dalan sa samuyang sityo, kaipuhan ayuson
+
+--- Road Hazard / Low ---
+  - Sasadit na lungag sa kalsada, gusto ko sanang i-report para maayos
+  - An linya sa kalsada dai na naheheling, kaipuhan bagong pintura
+  - Nahulog an signage sa kanto, kaipuhan nin kapalit
+
+--- Utility / High ---
+  - Nahulog an poste nin kuryente sa atubangan kan samuyang harong
+  - Naputol an linya nin kuryente asin nahulog sa kalsada, peligroso
+  - Daing tubig na maiinom sa samuyang lugar sa tulong aldaw na ini
+  - Naputol an pangenot na tubo nin tubig, gabos kami daing tubig
+
+--- Utility / Medium ---
+  - Nagrereklamo an mga residente huli ta daing tubig sa tulong aldaw na
+  - Parati kaming daing kuryente sa banggi, nagduman na kami sa barangay hall
+  - Gaba na an street light sa samuyang kalsada, peligroso sa banggi
+  - An water pressure digdi hababa na gayod, halos daing tubig
+
+--- Utility / Low ---
+  - Gusto ko sanang i-report na luag an takop kan drainage sa samuyang dalan
+  - An street light sa samuyang lugar naputulan nin ilaw, gusto ko sanang i-report
+  - Daing kuryente ngunyan kaya nagrereport sana kun may nangyari
+
+--- Landslide / High ---
+  - Igwa nin pagkagaba kan daga sa itaas kan bukid, nakaharang an dalan pasiring digdi
+  - Nahulog an daga hali sa mataas na parte pasiring sa mga harong sa ibaba
+  - Dakulang landslide sa kabukiran, may mga pamilyang naipit sa ibaba
+  - Nagkagaba an daga sa gilid kan kalsada sa bukid, peligroso sa mga sasakyan
+  - Biglang nahulog an dakulang parte kan bukid harani sa mga harong
+
+--- Landslide / Medium ---
+  - Nagpoon nang maggaba an daga sa bukid sa samuyang lugar, babantayan
+  - May naheling kaming pitak sa daga sa mataas na lugar, tibaad maggaba
+  - An gilid kan kalsada sa bukid naluluwag na, tibaad maggaba
+  - Dakul na gapo an nahulog hali sa taas ngunyan na tag-uran
+
+--- Landslide / Low ---
+  - May sadit na pagkagaba kan daga sa gilid kan kalsada, sadit sana man
+  - Nahulog an konting daga sa drainage, gusto ko sanang i-report
+  - May naheling kaming mga gapo sa kalsada, tibaad hali sa bukid
+
+--- Power Hazard / High ---
+  - May nahulog na buhay na alambre sa kalsada, peligroso sa gabos
+  - May electric shock an sarong aki sa atubangan kan samuyang harong
+  - Naputol an high tension wire asin nahulog sa palengke
+  - Nahulog an transformer harani sa palengke, may kalayong naluluwas
+
+--- Power Hazard / Medium ---
+  - An mga linya nin kuryente digdi hababa na gayod, peligroso
+  - May daan na transformer digdi, tibaad peligroso na
+  - An wiring kan sarong harong daan na, tibaad magkorto-sirkito
+
+--- Power Hazard / Low ---
+  - An ilaw sa samuyang sityo nagkikirap-kirap na, tibaad may problema sa linya
+  - May konting spark sa daan na socket sa samuyang barangay hall
+  - Gusto ko sanang i-report na an samuyang poste medyo naghihiro na
+
+--- Structural / High ---
+  - An harong kan samuyang kataed haros matumba na, kaipuhan lumihis
+  - An gusali sa samuyang lugar igwa nin dakulang pitak sa lanob, peligroso
+  - Natumba an atop kan alang na gusali, may naipit na tawo sa laog
+  - An tulay sa samuyang lugar igwa nin dakulang pitak, peligroso baklayon
+
+--- Structural / Medium ---
+  - An daan na barangay hall igwa nin mga pitak na sa lanob, kaipuhan suhayan
+  - An tulay sa samuyang barangay hababa na asin tibaad dai na matibay
+  - Dakul na pitak an lanob kan samuyang eskwelahan, tibaad peligroso
+
+--- Structural / Low ---
+  - An bakod kan parke digdi may sira na, dapat ayuson
+  - An pinto kan sityo hall sira na, masakit buksan
+  - May pitak sa plasa kan barangay, sadit sana man pero gusto ko sanang i-report
+
+--- Security / High ---
+  - May nagbabaril sa samuyang lugar, tako na an mga residente
+  - Naheling ko an sarong tawong may hawak na lading, nagbabanta sa mga tawo
+  - May nangagaw nin bag sa samuyang lugar, dakul na beses na ining nangyari
+  - May nag-iiriwal-wal asin naggagamit nin armas sa palengke, kaipuhan tulos nin pulis
+
+--- Security / Medium ---
+  - Dakul na adik an naheheling sa samuyang lugar kada banggi, kaipuhan aksyon
+  - May grupong nangongolekta nin lagay sa mga negosyante sa palengke
+  - Dakul na beses nang may naghahabon nin gulay sa samuyang sityo
+
+--- Security / Low ---
+  - Maribok an mga kabataan sa kanto kada banggi, dai kami makaturog
+  - Gusto ko sanang i-report na may mga estranghero na naheheling sa samuyang lugar
+  - May nagtatambay sa atubangan kan samuyang harong kada banggi
+
+--- Infrastructure / High ---
+  - Natumba an dakulang parte kan tulay sa samuyang lugar, peligroso
+  - Nagaba an pangenot na kalsada, dai na madadaanan kan mga sasakyan
+  - Nagbuto an sewage system asin nagresulta nin polusyon sa mga harong
+  - Natumba an retaining wall kan kalsada sa bukid, naipit an mga sasakyan
+
+--- Infrastructure / Medium ---
+  - An kalsada sa samuyang sityo garo lubak-lubak na asin gaba an drainage
+  - An tulay igwa nin dakulang lungag sa butnga, peligroso sa mga aki
+  - Gaba an mga manhole cover sa samuyang lugar, peligroso sa nagdadalagan
+
+--- Infrastructure / Low ---
+  - An pinto kan barangay basketball court sira na, dai nasasara
+  - An mga bangko sa plasa sira na, kaipuhan nin bagong bangko
+  - Gusto ko sanang i-report na an drainage sa samuyang sityo puno nin basura
+
+--- Food / High ---
+  - Dakul na tawo an naghelang pagkatapos kumaon sa kantina kan barangay
+  - May food poisoning na naeksperyensya kan dakul na residente hali sa sarong tindahan
+  - An tubig na ininom kan mga aki igwa nin kakaibang kahamis, tibaad kontaminado
+
+--- Food / Medium ---
+  - May tindahan sa palengke na nagbabakal nin maraot na karne, kaipuhan susugon
+  - Dakul na residente an dai nakakakaon huli sa kadaihan nin pagkaon
+  - Kaipuhan nin food assistance an dakul na pamilya sa samuyang barangay
+
+--- Food / Low ---
+  - Gusto ko sanang i-report na may nagbabakal nin expired na pagkaon sa tindahan
+  - Kaipuhan nin feeding program para sa mga aking mayong maabot na pagkaon
+
+--- Animal / High ---
+  - May ayam na daing kagsadiri na nagkakagat nin mga tawo sa samuyang lugar, peligroso
+  - Kinagat kan ayam an sarong aki na yaon sa dalan, kaipuhan nin tabang medikal
+  - Naheling an dakulang halas sa laog kan harong kan kataed mi, kaipuhan nin rescue
+
+--- Animal / Medium ---
+  - Dakul na ayam na daing kagsadiri sa samuyang lugar, delikado sa mga aki
+  - May naaamoy na maraot hali sa gadan na hayop sa salog, kaipuhan halion
+  - Dakul na daga na naghahaluwas sa samuyang lugar puon kan pagbaha
+
+--- Animal / Low ---
+  - Gusto ko sanang i-report na dakul na ayam na daing kagsadiri sa samuyang purok
+  - An mga ayam sa samuyang lugar mayong bakuna, dapat ayuson

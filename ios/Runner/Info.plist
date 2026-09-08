@@ -43,6 +43,13 @@
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>Used to pin your incident location for faster emergency response.</string>
 
+	<!-- CAMERA / PHOTO LIBRARY PERMISSIONS (required for attaching incident evidence photos) -->
+	<key>NSCameraUsageDescription</key>
+	<string>Used to take a photo of the incident as evidence for your report.</string>
+
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Used to attach a photo from your gallery as evidence for your report.</string>
+
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 

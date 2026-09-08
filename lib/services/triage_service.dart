@@ -1,30 +1,18 @@
-// triage_service.dart
-// Add this file to your Flutter project under lib/services/
-//
-// This connects your Flutter prototype to the Python ML API.
-//
-// Setup:
-//   1. Add to pubspec.yaml under dependencies:
-//        http: ^1.2.0
-//   2. Run: flutter pub get
-//   3. Import and use TriageService in your screens.
-
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../config.dart';
 
 // ─── CONFIG ──────────────────────────────────────────────────────────────────
-// Change this to your actual server IP when deploying.
-// For local testing on Android emulator: use 10.0.2.2 instead of localhost
-// For iOS simulator or real device on same WiFi: use your PC's local IP e.g. 192.168.1.x
-const String _baseUrl = 'http://10.0.2.2:8000'; // Android emulator default
+const String _baseUrl = kApiBaseUrl;
 
-// ─── RESPONSE MODEL ──────────────────────────────────────────────────────────
+// ─── RESPONSE MODELS ─────────────────────────────────────────────────────────
 class ClassificationResult {
   final String reportText;
   final String severity;
   final double severityConfidence;
   final Map<String, double> severityScores;
   final String message;
+  final String? languageHint;
 
   ClassificationResult({
     required this.reportText,
@@ -32,6 +20,7 @@ class ClassificationResult {
     required this.severityConfidence,
     required this.severityScores,
     required this.message,
+    this.languageHint,
   });
 
   factory ClassificationResult.fromJson(Map<String, dynamic> json) {
@@ -45,10 +34,10 @@ class ClassificationResult {
         ),
       ),
       message: json['message'] ?? '',
+      languageHint: json['language_hint'] as String?,
     );
   }
 
-  // Convenience: color code for severity (use in your UI widgets)
   String get severityEmoji {
     switch (severity) {
       case 'Critical': return '🔴';
@@ -60,18 +49,36 @@ class ClassificationResult {
   }
 }
 
+class ImageVerificationResult {
+  final bool isValidPhoto;
+  final String? detectedCategory;
+  final bool requiresManualReview;
+  final String verdict;
+
+  ImageVerificationResult({
+    required this.isValidPhoto,
+    this.detectedCategory,
+    required this.requiresManualReview,
+    required this.verdict,
+  });
+
+  factory ImageVerificationResult.fromJson(Map<String, dynamic> json) {
+    return ImageVerificationResult(
+      isValidPhoto: json['is_valid_report_photo'] ?? false,
+      detectedCategory: json['detected_disaster_category'],
+      requiresManualReview: json['requires_human_review'] ?? true,
+      verdict: json['verdict'] ?? '',
+    );
+  }
+}
+
 // ─── SERVICE CLASS ────────────────────────────────────────────────────────────
 class TriageService {
   static final TriageService _instance = TriageService._internal();
   factory TriageService() => _instance;
   TriageService._internal();
 
-  /// Classify a single citizen report.
-  /// Call this when a user submits a new report in your Flutter app.
-  ///
-  /// Example usage in your widget:
-  ///   final result = await TriageService().classifyReport(reportText);
-  ///   print(result.severity); // "Critical"
+  /// Classify a single citizen report via the RoBERTa text model.
   Future<ClassificationResult> classifyReport(String reportText) async {
     try {
       final response = await http.post(
@@ -87,7 +94,6 @@ class TriageService {
         throw Exception('Server error: ${response.statusCode}');
       }
     } catch (e) {
-      // Fail gracefully — return Unknown so app doesn't crash
       print('TriageService error: $e');
       return ClassificationResult(
         reportText: reportText,
@@ -96,6 +102,65 @@ class TriageService {
         severityScores: {},
         message: 'Classification unavailable. Please review manually.',
       );
+    }
+  }
+
+  /// Send an image to the MobileNetV3 multi-stage models for verification.
+  /// [reportedCategory] is optional — pass null when there's no category
+  /// selected yet (e.g. photo-first flow) so the backend just detects what's
+  /// in the photo instead of comparing it against a category and reporting
+  /// a false "mismatch".
+  Future<ImageVerificationResult?> verifyImage(List<int> imageBytes, String fileName, String? reportedCategory) async {
+    try {
+      var request = http.MultipartRequest('POST', Uri.parse('$_baseUrl/verify-image'));
+      if (reportedCategory != null) {
+        request.fields['reported_category'] = reportedCategory;
+      }
+      request.files.add(http.MultipartFile.fromBytes('file', imageBytes, filename: fileName));
+
+      var response = await request.send().timeout(const Duration(seconds: 20));
+
+      if (response.statusCode == 200) {
+        var responseData = await response.stream.bytesToString();
+        var jsonResult = jsonDecode(responseData);
+        return ImageVerificationResult.fromJson(jsonResult);
+      } else {
+        print('Image verification failed: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('TriageService verifyImage error: $e');
+      return null;
+    }
+  }
+
+  /// Dispatches Email notifications via the backend if severity is High.
+  /// TODO (future work): SMS dispatch is not yet implemented — email only for now.
+  Future<void> sendHighSeverityAlert({
+    required String category,
+    required String severity,
+    required String description,
+    String? location,
+    double? lat,
+    double? lng,
+    String? imageUrl,
+  }) async {
+    try {
+      await http.post(
+        Uri.parse('$_baseUrl/notify-high'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'category': category,
+          'severity': severity,
+          'description': description,
+          'location': location,
+          'lat': lat,
+          'lng': lng,
+          'image_url': imageUrl,
+        }),
+      ).timeout(const Duration(seconds: 10));
+    } catch (e) {
+      print('Failed to trigger background high alerts: $e');
     }
   }
 
@@ -111,46 +176,3 @@ class TriageService {
     }
   }
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// EXAMPLE: How to use TriageService in your existing Flutter screen
-// ─────────────────────────────────────────────────────────────────────────────
-//
-// In your report submission screen (e.g. submit_report_screen.dart):
-//
-// import 'package:your_app/services/triage_service.dart';
-//
-// class _SubmitReportScreenState extends State<SubmitReportScreen> {
-//   final _controller = TextEditingController();
-//   ClassificationResult? _result;
-//   bool _loading = false;
-//
-//   Future<void> _submitReport() async {
-//     setState(() => _loading = true);
-//
-//     final result = await TriageService().classifyReport(_controller.text);
-//
-//     setState(() {
-//       _result = result;
-//       _loading = false;
-//     });
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: Column(children: [
-//         TextField(controller: _controller, decoration: InputDecoration(labelText: 'I-type ang iyong ulat')),
-//         ElevatedButton(
-//           onPressed: _loading ? null : _submitReport,
-//           child: _loading ? CircularProgressIndicator() : Text('Isumite'),
-//         ),
-//         if (_result != null) ...[
-//           Text('${_result!.severityEmoji} Severity: ${_result!.severity}'),
-//           Text('Confidence: ${_result!.severityConfidence.toStringAsFixed(1)}%'),
-//           Text(_result!.message),
-//         ]
-//       ]),
-//     );
-//   }
-// }

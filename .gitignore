@@ -85,3 +85,4 @@ TRIAGEDelRo_backend/saved_model/
 TRIAGEDelRo_backend/logs/
 *.safetensors
 *.bin
+TRIAGEDelRo_backend/hf_build_watch_*.txt

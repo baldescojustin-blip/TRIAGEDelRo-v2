@@ -5,10 +5,22 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart' as latlng;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-// Removed auth_service.dart import
 import 'login.dart';
 import 'account_settings.dart';
+import 'floodrisk.dart';
 import '../main.dart';
+import '../config.dart';
+
+// Human-readable label for the language_hint values api.py's
+// detect_language_hint() can return.
+String _languageHintLabel(String hint) => switch (hint) {
+  'bikol' => 'Bikol',
+  'bikol-english' => 'Bikol-Eng',
+  'tagalog' => 'Filipino',
+  'taglish' => 'FIL-Eng',
+  'english' => 'English',
+  _ => hint,
+};
 
 class _Report {
   final String id;
@@ -22,6 +34,15 @@ class _Report {
   final String status;
   final DateTime submittedAt;
   final String? userId;
+  
+  final String? imageUrl;
+  final bool? isValidPhoto;
+  final String? detectedImageCategory;
+  final bool? requiresManualReview;
+  final String? languageHint;
+  final String? mlSeverity;
+  final double? mlConfidence;
+  final bool? mlOverridden;
 
   _Report({
     required this.id,
@@ -35,6 +56,14 @@ class _Report {
     required this.status,
     required this.submittedAt,
     this.userId,
+    this.imageUrl,
+    this.isValidPhoto,
+    this.detectedImageCategory,
+    this.requiresManualReview,
+    this.languageHint,
+    this.mlSeverity,
+    this.mlConfidence,
+    this.mlOverridden,
   });
 
   factory _Report.fromMap(Map<String, dynamic> m) => _Report(
@@ -49,6 +78,14 @@ class _Report {
     status: m['status'] ?? '',
     submittedAt: DateTime.parse(m['submitted_at']),
     userId: m['user_id'] as String?,
+    imageUrl: m['image_url'] as String?,
+    isValidPhoto: m['is_valid_photo'] as bool?,
+    detectedImageCategory: m['detected_image_category'] as String?,
+    requiresManualReview: m['requires_manual_review'] as bool?,
+    languageHint: m['language_hint'] as String?,
+    mlSeverity: m['ml_severity'] as String?,
+    mlConfidence: (m['ml_confidence'] as num?)?.toDouble(),
+    mlOverridden: m['ml_overridden'] as bool?,
   );
 
   bool get hasCoords => lat != null && lng != null;
@@ -74,6 +111,8 @@ class _OfficialDashboardState extends State<OfficialDashboard>
   bool _loadingReports = true;
   String _filterStatus = 'All';
   final _statuses = ['All', 'Pending', 'Ongoing', 'Resolved'];
+  
+  bool _showOnlyHighSeverity = true; 
 
   late AnimationController _pulseCtrl;
   late Animation<double> _pulse;
@@ -100,7 +139,6 @@ class _OfficialDashboardState extends State<OfficialDashboard>
     super.dispose();
   }
 
-  // --- SUPABASE CHANGE: Fetch real official data from your officials table ---
   Future<void> _loadUser() async {
     setState(() => _loadingUser = true);
     try {
@@ -127,15 +165,16 @@ class _OfficialDashboardState extends State<OfficialDashboard>
     }
   }
 
-  // --- SUPABASE CHANGE: Added safe type casting ---
   Future<void> _loadReports() async {
     setState(() => _loadingReports = true);
     try {
-      final data = await _supabase
-          .from('reports')
-          .select()
-          .order('submitted_at', ascending: false)
-          .limit(100);
+      var query = _supabase.from('reports').select();
+      
+      if (_showOnlyHighSeverity) {
+        query = query.eq('severity', 'High');
+      }
+
+      final data = await query.order('submitted_at', ascending: false).limit(100);
           
       setState(() {
         _reports = (data as List<dynamic>)
@@ -212,7 +251,6 @@ class _OfficialDashboardState extends State<OfficialDashboard>
     }
   }
 
-  // --- SUPABASE CHANGE: Native Supabase Sign Out ---
   Future<void> _logout() async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -295,8 +333,11 @@ class _OfficialDashboardState extends State<OfficialDashboard>
     return '${d.inDays}D AGO';
   }
 
+  // "All" means "still needs attention" — Resolved reports are done, so they
+  // don't belong in the default view where they'd bury Pending/Ongoing ones.
+  // They're still fully accessible via the explicit RESOLVED tab below.
   List<_Report> get _filtered => _filterStatus == 'All'
-      ? _reports
+      ? _reports.where((r) => r.status != 'Resolved').toList()
       : _reports.where((r) => r.status == _filterStatus).toList();
 
   Map<String, List<_Report>> get _groupedReports {
@@ -312,6 +353,8 @@ class _OfficialDashboardState extends State<OfficialDashboard>
   int get _ongoingCount => _reports.where((r) => r.status == 'Ongoing').length;
   int get _highCount => _reports.where((r) => r.severity == 'High').length;
   int get _mappableCount => _reports.where((r) => r.hasCoords).length;
+
+  int get _flaggedCount => _reports.where((r) => r.requiresManualReview == true && r.status != 'Resolved').length;
 
   @override
   Widget build(BuildContext context) {
@@ -331,7 +374,7 @@ class _OfficialDashboardState extends State<OfficialDashboard>
             ),
             const SizedBox(width: 10),
             const Text(
-              'TRIAGE DEL ROSARIO',
+              'MY LAUD',
               style: TextStyle(
                 fontFamily: 'Rajdhani',
                 fontSize: 16,
@@ -423,7 +466,115 @@ class _OfficialDashboardState extends State<OfficialDashboard>
                       onTap: _openAccountSettings,
                       pulse: _pulse,
                     ),
+                    const SizedBox(height: 16),
+
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+                      decoration: BoxDecoration(
+                        color: AppColors.electric.withValues(alpha: 0.06),
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: AppColors.electric.withValues(alpha: 0.25)),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Icon(Icons.info_outline_rounded, color: AppColors.electric, size: 16),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'AI-ASSISTED TRIAGE — NOT FINAL',
+                                  style: TextStyle(
+                                    fontFamily: 'Rajdhani',
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.electric,
+                                    letterSpacing: 1.5,
+                                  ),
+                                ),
+                                const SizedBox(height: 3),
+                                Text(
+                                  'Severity levels shown here are ML-generated suggestions. A barangay official must review and confirm each report before dispatching a response.',
+                                  style: TextStyle(
+                                    fontFamily: 'IBMPlexMono',
+                                    fontSize: 9.5,
+                                    color: AppColors.textSecondary,
+                                    height: 1.5,
+                                    letterSpacing: 0.3,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+
+                    if (_flaggedCount > 0) ...[
+                      Container(
+                        width: double.infinity,
+                        color: AppColors.amber.withValues(alpha: 0.15),
+                        padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.warning_amber_rounded, color: AppColors.amber, size: 20),
+                            const SizedBox(width: 8),
+                            Text(
+                              "$_flaggedCount REPORT(S) REQUIRE MANUAL VERIFICATION",
+                              style: const TextStyle(
+                                fontFamily: 'Rajdhani',
+                                color: AppColors.amber,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 1.5,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                    ],
+
+                    Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.void_,
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: AppColors.border),
+                      ),
+                      child: SwitchListTile(
+                        title: const Text(
+                          "FILTER HIGH SEVERITY",
+                          style: TextStyle(
+                            fontFamily: 'Rajdhani',
+                            color: AppColors.textPrimary,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.5,
+                          ),
+                        ),
+                        subtitle: const Text(
+                          "Turn off to view Medium, Low, and Minor concerns.",
+                          style: TextStyle(
+                            fontFamily: 'IBMPlexMono',
+                            color: AppColors.textDim,
+                            fontSize: 10,
+                          ),
+                        ),
+                        activeColor: AppColors.electric,
+                        value: _showOnlyHighSeverity,
+                        onChanged: (bool value) {
+                          setState(() {
+                            _showOnlyHighSeverity = value;
+                          });
+                          _loadReports(); 
+                        },
+                      ),
+                    ),
                     const SizedBox(height: 24),
+
                     _SectionLabel(
                       label: 'INCIDENT OVERVIEW',
                       tag: _timeAgo(DateTime.now()),
@@ -453,6 +604,10 @@ class _OfficialDashboardState extends State<OfficialDashboard>
                         ),
                       ],
                     ),
+                    const SizedBox(height: 12),
+
+                    // ─── RAINFALL-BASED FLOOD RISK FORECAST (advisory only — not a live water-level sensor reading) ───────────
+                    const FloodRiskCard(baseUrl: kApiBaseUrl),
                     const SizedBox(height: 12),
 
                     if (_mappableCount > 0) ...[
@@ -529,7 +684,7 @@ class _OfficialDashboardState extends State<OfficialDashboard>
                       const SizedBox(height: 16),
 
                     _SectionLabel(
-                      label: 'ALL INCIDENT REPORTS',
+                      label: 'INCIDENT REPORTS',
                       tag: '${_filtered.length} RECORDS',
                     ),
                     const SizedBox(height: 12),
@@ -561,7 +716,7 @@ class _OfficialDashboardState extends State<OfficialDashboard>
                                 ),
                               ),
                               child: Text(
-                                s.toUpperCase(),
+                                s == 'All' ? 'ACTIVE' : s.toUpperCase(),
                                 style: TextStyle(
                                   fontFamily: 'IBMPlexMono',
                                   fontSize: 9,
@@ -889,7 +1044,82 @@ class _ReportDetailScreenState extends State<_ReportDetailScreen> {
                 ),
               ],
             ),
+            const SizedBox(height: 10),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(Icons.info_outline_rounded, size: 12, color: AppColors.textDim),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    'Severity was assigned by AI/ML triage and is a suggestion only — verify before dispatching a response.',
+                    style: TextStyle(
+                      fontFamily: 'IBMPlexMono',
+                      fontSize: 9,
+                      color: AppColors.textDim,
+                      height: 1.5,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                ),
+              ],
+            ),
             const SizedBox(height: 20),
+
+            if (r.mlSeverity != null) ...[
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: (r.mlOverridden == true ? AppColors.amber : AppColors.electric)
+                      .withValues(alpha: 0.06),
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(
+                    color: (r.mlOverridden == true ? AppColors.amber : AppColors.electric)
+                        .withValues(alpha: 0.25),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.auto_awesome,
+                          size: 12,
+                          color: r.mlOverridden == true ? AppColors.amber : AppColors.electric,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          r.mlOverridden == true ? 'SEVERITY WAS OVERRIDDEN' : 'AI SUGGESTION CONFIRMED',
+                          style: TextStyle(
+                            fontFamily: 'Rajdhani',
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: r.mlOverridden == true ? AppColors.amber : AppColors.electric,
+                            letterSpacing: 1.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      r.mlConfidence != null
+                          ? 'AI suggested ${r.mlSeverity!.toUpperCase()} (${r.mlConfidence!.toStringAsFixed(1)}% confidence).'
+                                '${r.mlOverridden == true ? ' A human set the final severity to ${r.severity.toUpperCase()}.' : ''}'
+                          : 'AI suggested ${r.mlSeverity!.toUpperCase()}.',
+                      style: const TextStyle(
+                        fontFamily: 'IBMPlexMono',
+                        fontSize: 9.5,
+                        color: AppColors.textSecondary,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+            ],
 
             _DetailRow(
               icon: Icons.access_time_rounded,
@@ -897,6 +1127,89 @@ class _ReportDetailScreenState extends State<_ReportDetailScreen> {
               value: _formatDateTime(r.submittedAt),
             ),
             const SizedBox(height: 16),
+
+            if (r.imageUrl != null) ...[
+              _DetailSection(
+                label: 'ATTACHED EVIDENCE',
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: Image.network(
+                        r.imageUrl!,
+                        width: double.infinity,
+                        height: 250,
+                        fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Container(
+                            height: 250,
+                            color: AppColors.surface,
+                            child: const Center(
+                              child: CircularProgressIndicator(color: AppColors.electric),
+                            ),
+                          );
+                        },
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          height: 150,
+                          color: AppColors.surface,
+                          child: const Center(
+                            child: Icon(Icons.broken_image_outlined, color: AppColors.textDim),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    
+                    if (r.requiresManualReview == true)
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: AppColors.amber.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(
+                            color: AppColors.amber.withValues(alpha: 0.3),
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Row(
+                              children: [
+                                Icon(
+                                  Icons.warning_amber_rounded,
+                                  size: 14,
+                                  color: AppColors.amber,
+                                ),
+                                SizedBox(width: 8),
+                                Text(
+                                  'HUMAN OVERRIDE DETECTED',
+                                  style: TextStyle(
+                                    fontFamily: 'Rajdhani',
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.amber,
+                                    letterSpacing: 1.5,
+                                  ),
+                                ),
+                                Spacer(),
+                                _Badge(label: 'MANUAL REVIEW', color: AppColors.amber),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            const Text(
+                              "My Laud's AI couldn't confidently match this photo to a known disaster type, but the citizen chose to attach it anyway. Please verify the evidence yourself.",
+                              style: TextStyle(fontFamily: 'IBMPlexMono', fontSize: 10, color: AppColors.textSecondary),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+            ],
 
             _DetailSection(
               label: 'INCIDENT DESCRIPTION',
@@ -1029,6 +1342,14 @@ class _ReportDetailScreenState extends State<_ReportDetailScreen> {
                     label: 'SEVERITY',
                     value: r.severity,
                   ),
+                  if (r.languageHint != null) ...[
+                    const SizedBox(height: 10),
+                    _DetailRow(
+                      icon: Icons.translate_rounded,
+                      label: 'DETECTED LANGUAGE',
+                      value: _languageHintLabel(r.languageHint!),
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -1175,8 +1496,6 @@ class _DetailRow extends StatelessWidget {
   );
 }
 
-// ─── Incident Map Screen ──────────────────────────────────────────────────────
-
 class _IncidentMapScreen extends StatefulWidget {
   final List<_Report> reports;
   const _IncidentMapScreen({required this.reports});
@@ -1206,7 +1525,6 @@ class _IncidentMapScreenState extends State<_IncidentMapScreen> {
       ? widget.reports
       : widget.reports.where((r) => r.severity == _filterSeverity).toList();
 
-  // ── UPDATED: Barangay Del Rosario, Milaor, Camarines Sur ──
   latlng.LatLng get _center {
     if (_filtered.isEmpty) return const latlng.LatLng(13.5919, 123.1787);
     final lats = _filtered.map((r) => r.lat!);
@@ -1525,8 +1843,6 @@ class _MapReportCard extends StatelessWidget {
     ),
   );
 }
-
-// ─── Widgets ──────────────────────────────────────────────────────────────────
 
 class _SectionLabel extends StatelessWidget {
   final String label;
@@ -1918,6 +2234,14 @@ class _IncidentCard extends StatelessWidget {
                       color: AppColors.electric.withValues(alpha: 0.7),
                     ),
                   ],
+                  if (report.imageUrl != null) ...[
+                    const SizedBox(width: 6),
+                    const Icon(Icons.image_outlined, size: 11, color: AppColors.textDim),
+                  ],
+                  if (report.requiresManualReview == true) ...[
+                    const SizedBox(width: 6),
+                    const Icon(Icons.warning_amber_rounded, size: 12, color: AppColors.amber),
+                  ],
                   const Spacer(),
                   Text(
                     timeAgo,
@@ -2062,8 +2386,6 @@ class _Badge extends StatelessWidget {
     ),
   );
 }
-
-// ─── Painters ─────────────────────────────────────────────────────────────────
 
 class _MiniHexPainter extends CustomPainter {
   final Color fillColor;
@@ -2228,7 +2550,7 @@ class _LogoutDialog extends StatelessWidget {
                     'SIGN OUT',
                     style: TextStyle(
                       fontFamily: 'Rajdhani',
-                      letterSpacing: 2,
+                      letterSpacing: 2, 
                       fontWeight: FontWeight.w700,
                     ),
                   ),

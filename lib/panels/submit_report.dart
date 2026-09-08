@@ -1,25 +1,32 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:image_picker/image_picker.dart';
 import '../services/auth_service.dart';
+import '../services/triage_service.dart';
 import '../main.dart';
+import '../config.dart';
 
-const _mlApiBase = 'http://192.168.100.134:8000';
+const _mlApiBase = kApiBaseUrl;
 
 class _MlResult {
   final String severity;
   final double confidence;
   final Map<String, double> scores;
   final String message;
+  final String? languageHint;
 
   _MlResult({
     required this.severity,
     required this.confidence,
     required this.scores,
     required this.message,
+    this.languageHint,
   });
 
   factory _MlResult.fromJson(Map<String, dynamic> j) => _MlResult(
@@ -31,8 +38,20 @@ class _MlResult {
       ),
     ),
     message: j['message'] ?? '',
+    languageHint: j['language_hint'] as String?,
   );
 }
+
+// Human-readable label for the language_hint values api.py's
+// detect_language_hint() can return.
+String _languageHintLabel(String hint) => switch (hint) {
+  'bikol' => 'Bikol',
+  'bikol-english' => 'Bikol-Eng',
+  'tagalog' => 'Filipino',
+  'taglish' => 'FIL-Eng',
+  'english' => 'English',
+  _ => hint,
+};
 
 // ─── Categories ───────────────────────────────────────────────────────────────
 const _emergencyCategories = [
@@ -41,6 +60,14 @@ const _emergencyCategories = [
   'Medical Emergency',
   'Infrastructure Damage',
 ];
+
+// The vision model (api.py's phase2 classifier) only recognizes
+// Earthquake/Fire/Flood/Landslide scenes — it has no training data for
+// Medical Emergency or Infrastructure Damage photos. Running AI verification
+// on those categories doesn't produce "no answer", it forces a wrong
+// Earthquake/Fire/Flood/Landslide guess and always reports a false mismatch.
+// So we only run the deep AI check for categories it can actually judge.
+const _visionVerifiableCategories = ['Flooding', 'Fire'];
 
 const _minorCategories = [
   'Waste Collection',
@@ -77,7 +104,6 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
   late List<Animation<double>> _fadeAnims;
   late Animation<double> _scan;
 
-  // NEW: Toggle between Emergency and Minor Concern
   bool _isMinorConcern = false; 
 
   String? _selectedCategory;
@@ -91,6 +117,15 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
   double? _pinnedLat;
   double? _pinnedLng;
   bool _gettingLocation = false;
+
+  // NEW: Image Picker Variables & Pre-verification state
+  final ImagePicker _picker = ImagePicker();
+  XFile? _selectedImage;
+  bool _verifyingImage = false;
+  
+  bool _isValidPhoto = true;
+  String? _detectedImageCategory;
+  bool _requiresManualReview = false;
 
   final _supabase = Supabase.instance.client;
 
@@ -107,7 +142,7 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
     )..repeat();
 
     _slideAnims = List.generate(
-      10, // Increased for new elements
+      10,
       (i) => Tween<Offset>(
         begin: const Offset(0, 0.08),
         end: Offset.zero,
@@ -180,11 +215,11 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
     if (_isMinorConcern == isMinor) return;
     setState(() {
       _isMinorConcern = isMinor;
-      _selectedCategory = null; // Reset category
-      _mlResult = null; // Clear ML result
+      _selectedCategory = null; 
+      _mlResult = null; 
+      _selectedImage = null; // Clear image when switching context
       
       if (isMinor) {
-        // Automatically set to low severity for minor concerns
         _selectedSeverity = 'Low'; 
       } else {
         _selectedSeverity = null;
@@ -192,8 +227,244 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
     });
   }
 
+  // --- UPDATED: HUMAN-IN-THE-LOOP OVERRIDE LOGIC ---
+  Future<void> _handleImageSelected(XFile file) async {
+    setState(() {
+      _verifyingImage = true;
+      _selectedImage = null; // Hide current while analyzing
+    });
+
+    try {
+      final bytes = await file.readAsBytes();
+      final fileName = file.name;
+      
+      // Run the deep AI image check when either:
+      //  - no category is picked yet (photo-first flow — detect it fresh so
+      //    we can auto-fill the category chip), or
+      //  - the user already picked a category the vision model actually
+      //    covers (Flooding, Fire) — cross-check the photo against it.
+      // Medical Emergency / Infrastructure Damage have no matching vision
+      // class, so a category already set to one of those skips AI entirely
+      // rather than forcing a guaranteed-wrong verdict.
+      final shouldRunVision = !_isMinorConcern &&
+          (_selectedCategory == null || _visionVerifiableCategories.contains(_selectedCategory));
+
+      if (shouldRunVision) {
+        final verification = await TriageService().verifyImage(bytes, fileName, _selectedCategory);
+        if (!mounted) return; // user navigated away while this was in flight
+
+        if (verification != null) {
+          if (!verification.isValidPhoto) {
+            // Turn off the loading spinner before showing the prompt
+            setState(() => _verifyingImage = false);
+
+            // SHOW OVERRIDE DIALOG
+            final proceed = await showDialog<bool>(
+              context: context,
+              barrierDismissible: false,
+              builder: (ctx) => Dialog(
+                backgroundColor: AppColors.void_,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(6),
+                  side: const BorderSide(color: AppColors.border),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(width: 3, height: 18, color: AppColors.amber),
+                          const SizedBox(width: 10),
+                          const Text(
+                            'AI WARNING',
+                            style: TextStyle(
+                              fontFamily: 'Rajdhani',
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.amber,
+                              letterSpacing: 2,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      const Text(
+                        "My Laud's AI couldn't confidently match this photo to a known disaster type (Fire or Flood). You can still attach it — a barangay official will review it manually before it's confirmed.",
+                        style: TextStyle(
+                          fontFamily: 'IBMPlexMono',
+                          fontSize: 11,
+                          color: AppColors.textSecondary,
+                          height: 1.6,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              style: OutlinedButton.styleFrom(
+                                side: const BorderSide(color: AppColors.border),
+                                foregroundColor: AppColors.textSecondary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                              ),
+                              onPressed: () => Navigator.pop(ctx, false),
+                              child: const Text(
+                                'CANCEL',
+                                style: TextStyle(
+                                  fontFamily: 'Rajdhani',
+                                  letterSpacing: 2,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.amber.withValues(alpha: 0.15),
+                                foregroundColor: AppColors.amber,
+                                side: BorderSide(
+                                  color: AppColors.amber.withValues(alpha: 0.4),
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                elevation: 0,
+                              ),
+                              onPressed: () => Navigator.pop(ctx, true),
+                              child: const Text(
+                                'YES, ATTACH',
+                                style: TextStyle(
+                                  fontFamily: 'Rajdhani',
+                                  letterSpacing: 1,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+            if (!mounted) return;
+
+            // If user clicks "YES, ATTACH", we accept the photo but flag it
+            if (proceed == true) {
+              setState(() {
+                _isValidPhoto = false;
+                _detectedImageCategory = 'Unknown';
+                _requiresManualReview = true;
+                _selectedImage = file;
+              });
+            }
+            return; // Exit the function since we handled the flow here
+          } else {
+            // Normal behavior if the AI successfully recognizes it
+            _isValidPhoto = verification.isValidPhoto;
+            _detectedImageCategory = verification.detectedCategory;
+            _requiresManualReview = verification.requiresManualReview;
+
+            // AUTO-FILL CATEGORY: no category was picked yet and the photo
+            // was recognized as one the app actually supports — select it
+            // automatically. Still just a suggestion: the category chips
+            // stay tappable, so the resident (or an official reviewing
+            // later) can override it like any other AI suggestion.
+            if (_selectedCategory == null &&
+                verification.detectedCategory != null &&
+                _emergencyCategories.contains(verification.detectedCategory)) {
+              setState(() => _selectedCategory = verification.detectedCategory);
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    backgroundColor: AppColors.void_,
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4),
+                      side: const BorderSide(color: AppColors.electric, width: 1),
+                    ),
+                    content: Row(
+                      children: [
+                        const Icon(Icons.auto_awesome, color: AppColors.electric, size: 14),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            'CATEGORY AUTO-DETECTED: ${verification.detectedCategory!.toUpperCase()} — tap another chip to change it',
+                            style: const TextStyle(
+                              fontFamily: 'IBMPlexMono',
+                              fontSize: 9,
+                              color: AppColors.electric,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
+            }
+          }
+        }
+      }
+
+      setState(() {
+        _selectedImage = file;
+      });
+    } catch (e) {
+      _showError('IMAGE VERIFICATION FAILED. PLEASE TRY AGAIN.');
+    } finally {
+      if (mounted && _verifyingImage) setState(() => _verifyingImage = false);
+    }
+  }
+
+  Future<void> _showImageSourceActionSheet() async {
+    // No category required up front — attaching a photo of Fire/Flooding
+    // now auto-detects and fills the category via _handleImageSelected.
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.void_,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+        side: BorderSide(color: AppColors.border),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Wrap(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt_outlined, color: AppColors.electric),
+              title: const Text('TAKE A PHOTO', style: TextStyle(fontFamily: 'Rajdhani', color: AppColors.textPrimary)),
+              onTap: () async {
+                Navigator.of(ctx).pop();
+                final pickedFile = await _picker.pickImage(source: ImageSource.camera, imageQuality: 80);
+                if (pickedFile != null) await _handleImageSelected(pickedFile);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library_outlined, color: AppColors.electric),
+              title: const Text('CHOOSE FROM GALLERY', style: TextStyle(fontFamily: 'Rajdhani', color: AppColors.textPrimary)),
+              onTap: () async {
+                Navigator.of(ctx).pop();
+                final pickedFile = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+                if (pickedFile != null) await _handleImageSelected(pickedFile);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Future<void> _classifyDescription() async {
-    // Don't auto-classify minor concerns
     if (_isMinorConcern) return; 
 
     final text = _descriptionCtrl.text.trim();
@@ -368,9 +639,26 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
         await _classifyDescription();
       }
 
+      String? imageUrl;
+
+      // Upload the already verified image to Supabase
+      if (_selectedImage != null) {
+        final bytes = await _selectedImage!.readAsBytes();
+        final fileExt = _selectedImage!.name.split('.').last;
+        final storageFileName = '${DateTime.now().millisecondsSinceEpoch}.$fileExt';
+        
+        await _supabase.storage.from('report_images').uploadBinary(
+          storageFileName, 
+          bytes,
+          fileOptions: FileOptions(contentType: 'image/$fileExt'),
+        );
+        imageUrl = _supabase.storage.from('report_images').getPublicUrl(storageFileName);
+      }
+
       final user = _supabase.auth.currentUser;
       final userData = AuthService.getUserData();
 
+      // Save full record to Supabase Database
       await _supabase.from('reports').insert({
         'user_id': user?.id,
         'description': _descriptionCtrl.text.trim(),
@@ -381,8 +669,31 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
         'severity': _selectedSeverity,
         'status': 'Pending',
         'barangay': userData?['barangay'] ?? 'Del Rosario',
-        'report_type': _isMinorConcern ? 'Minor Concern' : 'Emergency', // Optional: Good to track in DB
+        'report_type': _isMinorConcern ? 'Minor Concern' : 'Emergency',
+        'image_url': imageUrl,
+        'is_valid_photo': _selectedImage != null ? _isValidPhoto : null,
+        'detected_image_category': _selectedImage != null ? _detectedImageCategory : null,
+        'requires_manual_review': _selectedImage != null ? _requiresManualReview : null,
+        'language_hint': _mlResult?.languageHint,
+        // Preserves what the AI actually suggested, separate from the final
+        // 'severity' above — lets officials see when/if a human overrode it.
+        'ml_severity': _mlResult?.severity,
+        'ml_confidence': _mlResult?.confidence,
+        'ml_overridden': _mlResult != null ? _mlOverridden : null,
       });
+
+      // TRIGGER HIGH SEVERITY EMAIL DISPATCH (SMS not yet implemented — future work)
+      if (_selectedSeverity == 'High') {
+        TriageService().sendHighSeverityAlert(
+          category: _selectedCategory!,
+          severity: _selectedSeverity!,
+          description: _descriptionCtrl.text.trim(),
+          location: _locationCtrl.text.trim(),
+          lat: _pinnedLat,
+          lng: _pinnedLng,
+          imageUrl: imageUrl,
+        );
+      }
 
       if (!mounted) return;
       _showSuccess();
@@ -390,7 +701,9 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
       if (!mounted) return;
       _showError('TRANSMISSION FAILED — ${e.toString().toUpperCase()}');
     } finally {
-      if (mounted) setState(() => _submitting = false);
+      if (mounted) setState(() {
+        _submitting = false;
+      });
     }
   }
 
@@ -672,7 +985,6 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   
-                  // NEW: Segmented Control Toggle
                   _animated(
                     0,
                     Container(
@@ -706,12 +1018,12 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                   ),
                   const SizedBox(height: 28),
 
-                  _animated(1, _SectionHeader('CATEGORY')),
+                  _animated(1, const _SectionHeader('CATEGORY')),
                   const SizedBox(height: 14),
                   _animated(
                     1,
                     GridView.count(
-                      crossAxisCount: _isMinorConcern ? 3 : 2, // 3 columns for minor, 2 for major
+                      crossAxisCount: _isMinorConcern ? 3 : 2, 
                       crossAxisSpacing: 10,
                       mainAxisSpacing: 10,
                       shrinkWrap: true,
@@ -733,7 +1045,7 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                               ),
                             ),
                             child: _isMinorConcern 
-                            ? Column( // Stack icon above text for 3-column minor layout
+                            ? Column( 
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(
@@ -757,7 +1069,7 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                                   ),
                                 ],
                               )
-                            : Row( // Side-by-side for emergency layout
+                            : Row( 
                                 children: [
                                   Icon(
                                     _categoryIcon(cat),
@@ -787,7 +1099,7 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                   ),
                   const SizedBox(height: 28),
 
-                  _animated(2, _SectionHeader('DESCRIPTION')),
+                  _animated(2, const _SectionHeader('DESCRIPTION')),
                   const SizedBox(height: 4),
                   _animated(
                     2,
@@ -841,63 +1153,108 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                   ),
                   const SizedBox(height: 10),
 
-                  // Show Evidence Upload for Minor Concerns
-                  if (_isMinorConcern) ...[
-                    _animated(3, _SectionHeader('EVIDENCE')),
-                    const SizedBox(height: 14),
-                    _animated(
-                      3,
-                      GestureDetector(
-                        onTap: () {
-                          // TODO: Implement Image Picker here in the future
-                          _showError('PHOTO UPLOAD PENDING STORAGE CONFIGURATION');
-                        },
-                        child: Container(
+                  _animated(3, const _SectionHeader('EVIDENCE (OPTIONAL)')),
+                  const SizedBox(height: 14),
+                  _animated(
+                    3,
+                    _verifyingImage
+                      ? Container(
                           width: double.infinity,
-                          padding: const EdgeInsets.symmetric(vertical: 24),
+                          padding: const EdgeInsets.symmetric(vertical: 40),
                           decoration: BoxDecoration(
                             color: AppColors.surface,
                             borderRadius: BorderRadius.circular(6),
-                            border: Border.all(color: AppColors.border, width: 1.5, style: BorderStyle.none),
+                            border: Border.all(color: AppColors.electric.withValues(alpha: 0.5)),
                           ),
-                          child: CustomPaint(
-                            painter: _DashedBorderPainter(),
-                            child: const Column(
-                              children: [
-                                Icon(Icons.add_a_photo_outlined, color: AppColors.electric, size: 32),
-                                SizedBox(height: 12),
-                                Text(
-                                  'TAP TO UPLOAD PHOTOS',
-                                  style: TextStyle(
-                                    fontFamily: 'Rajdhani',
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.textPrimary,
-                                    letterSpacing: 1,
-                                  ),
+                          child: const Column(
+                            children: [
+                              CircularProgressIndicator(color: AppColors.electric),
+                              SizedBox(height: 16),
+                              Text(
+                                'AI VERIFYING IMAGE...',
+                                style: TextStyle(
+                                  fontFamily: 'Rajdhani',
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.electric,
+                                  letterSpacing: 2,
                                 ),
-                                SizedBox(height: 4),
-                                Text(
-                                  'Maximum 3 files (JPG, PNG)',
-                                  style: TextStyle(
-                                    fontFamily: 'IBMPlexMono',
-                                    fontSize: 10,
-                                    color: AppColors.textDim,
+                              ),
+                            ],
+                          ),
+                        )
+                      : _selectedImage == null
+                        ? GestureDetector(
+                            onTap: _showImageSourceActionSheet,
+                            child: Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(vertical: 24),
+                              decoration: BoxDecoration(
+                                color: AppColors.surface,
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(color: AppColors.border, width: 1.5, style: BorderStyle.none),
+                              ),
+                              child: CustomPaint(
+                                painter: _DashedBorderPainter(),
+                                child: const Column(
+                                  children: [
+                                    Icon(Icons.add_a_photo_outlined, color: AppColors.electric, size: 32),
+                                    SizedBox(height: 12),
+                                    Text(
+                                      'TAP TO ATTACH PHOTO',
+                                      style: TextStyle(
+                                        fontFamily: 'Rajdhani',
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.textPrimary,
+                                        letterSpacing: 1,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          )
+                        : Container(
+                            width: double.infinity,
+                            height: 200,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(6),
+                              border: Border.all(color: AppColors.electric, width: 2),
+                            ),
+                            child: Stack(
+                              fit: StackFit.expand,
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(4),
+                                  child: kIsWeb
+                                      ? Image.network(_selectedImage!.path, fit: BoxFit.cover)
+                                      : Image.file(File(_selectedImage!.path), fit: BoxFit.cover),
+                                ),
+                                Positioned(
+                                  top: 8,
+                                  right: 8,
+                                  child: GestureDetector(
+                                    onTap: () => setState(() => _selectedImage = null),
+                                    child: Container(
+                                      padding: const EdgeInsets.all(6),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.void_.withValues(alpha: 0.8),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(Icons.close, color: AppColors.red, size: 18),
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 28),
-                  ],
+                  ),
+                  const SizedBox(height: 28),
 
-                  // Show ML / Severity only for Emergencies
                   if (!_isMinorConcern) ...[
                     _animated(
-                      3,
+                      4,
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
@@ -966,6 +1323,26 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                                         ),
                                       ),
                                       const Spacer(),
+                                      if (_mlResult!.languageHint != null) ...[
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                          decoration: BoxDecoration(
+                                            color: AppColors.electric.withValues(alpha: 0.1),
+                                            borderRadius: BorderRadius.circular(2),
+                                            border: Border.all(color: AppColors.electric.withValues(alpha: 0.3)),
+                                          ),
+                                          child: Text(
+                                            _languageHintLabel(_mlResult!.languageHint!).toUpperCase(),
+                                            style: const TextStyle(
+                                              fontFamily: 'IBMPlexMono',
+                                              fontSize: 8,
+                                              color: AppColors.electric,
+                                              letterSpacing: 1,
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 6),
+                                      ],
                                       if (_mlOverridden)
                                         Container(
                                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -1072,7 +1449,7 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                     ),
                     const SizedBox(height: 28),
 
-                    _animated(4, _SectionHeader('SEVERITY LEVEL')),
+                    _animated(4, const _SectionHeader('SEVERITY LEVEL')),
                     const SizedBox(height: 4),
                     _animated(
                       4,
@@ -1193,7 +1570,7 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                     const SizedBox(height: 28),
                   ],
 
-                  _animated(5, _SectionHeader('LOCATION')),
+                  _animated(5, const _SectionHeader('LOCATION')),
                   const SizedBox(height: 14),
                   _animated(
                     5,
@@ -1326,11 +1703,27 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
                                 borderRadius: BorderRadius.circular(4),
                                 border: Border.all(color: AppColors.electric.withValues(alpha: 0.3)),
                               ),
-                              child: const Center(
-                                child: SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(color: AppColors.electric, strokeWidth: 2),
+                              child: Center(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(color: AppColors.electric, strokeWidth: 2),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    const Text(
+                                      'TRANSMITTING...',
+                                      style: TextStyle(
+                                        fontFamily: 'Rajdhani',
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.electric,
+                                        letterSpacing: 2,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             )
@@ -1355,7 +1748,6 @@ class _SubmitReportScreenState extends State<SubmitReportScreen>
 
 // ─── Custom Widgets ─────────────────────────────────────────────────────────
 
-// NEW: Segmented Tab for the Report Type
 class _TacticalTab extends StatelessWidget {
   final String label;
   final IconData icon;
@@ -1406,7 +1798,6 @@ class _TacticalTab extends StatelessWidget {
   }
 }
 
-// NEW: Dashed Border for Image Upload
 class _DashedBorderPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
@@ -1418,7 +1809,6 @@ class _DashedBorderPainter extends CustomPainter {
     final path = Path()
       ..addRRect(RRect.fromRectAndRadius(Rect.fromLTWH(0, 0, size.width, size.height), const Radius.circular(6)));
 
-    // Create dash effect
     const dashWidth = 6.0;
     const dashSpace = 4.0;
     double distance = 0.0;

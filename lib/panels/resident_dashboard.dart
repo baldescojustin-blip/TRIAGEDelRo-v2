@@ -4,14 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart' as latlng;
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'floodrisk.dart';
 
-// Removed auth_service.dart import since Supabase handles this directly now
 import 'login.dart';
 import 'account_settings.dart';
 import 'submit_report.dart';
 import 'document_request.dart';
 import 'announcements_screen.dart';
 import '../main.dart';
+import '../config.dart';
 
 class _Report {
   final String id;
@@ -67,7 +68,6 @@ class _ResidentDashboardState extends State<ResidentDashboard>
   bool _loadingUser = true;
   bool _loadingReports = true;
 
-  // FAB expand state
   bool _fabExpanded = false;
 
   late AnimationController _pulseCtrl;
@@ -120,13 +120,11 @@ class _ResidentDashboardState extends State<ResidentDashboard>
     }
   }
 
-  // --- SUPABASE CHANGE: Fetch real user data from your residents table ---
   Future<void> _loadUser() async {
     setState(() => _loadingUser = true);
     try {
       final userId = _supabase.auth.currentUser?.id;
       if (userId != null) {
-        // Fetch from the 'residents' table using the Auth ID
         final data = await _supabase
             .from('residents')
             .select('username, first_name, last_name')
@@ -147,7 +145,6 @@ class _ResidentDashboardState extends State<ResidentDashboard>
     }
   }
 
-  // --- SUPABASE CHANGE: Added safe type casting for data mapping ---
   Future<void> _loadReports() async {
     setState(() => _loadingReports = true);
     try {
@@ -173,14 +170,13 @@ class _ResidentDashboardState extends State<ResidentDashboard>
     }
   }
 
-  // --- SUPABASE CHANGE: Native Supabase Sign Out ---
   Future<void> _logout() async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => const _LogoutDialog(),
     );
     if (confirmed == true) {
-      await _supabase.auth.signOut(); // Directly sign out via Supabase
+      await _supabase.auth.signOut(); 
       
       if (!mounted) return;
       Navigator.pushAndRemoveUntil(
@@ -381,7 +377,6 @@ class _ResidentDashboardState extends State<ResidentDashboard>
                       ),
                       const SizedBox(height: 20),
 
-                      // ── Quick Action Cards Row 1 ───────────────────────
                       _SectionLabel(
                         label: 'QUICK ACTIONS',
                         tag: 'SELECT TO PROCEED',
@@ -409,7 +404,6 @@ class _ResidentDashboardState extends State<ResidentDashboard>
                         ],
                       ),
                       const SizedBox(height: 12),
-                      // ── Quick Action Cards Row 2 ───────────────────────
                       Row(
                         children: [
                           Expanded(
@@ -417,7 +411,7 @@ class _ResidentDashboardState extends State<ResidentDashboard>
                               icon: Icons.how_to_vote_outlined,
                               label: 'Vote / Poll',
                               color: AppColors.amber,
-                              onTap: () {}, // TODO: wire to vote/poll screen
+                              onTap: () {}, 
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -466,9 +460,13 @@ class _ResidentDashboardState extends State<ResidentDashboard>
                           ),
                         ],
                       ),
+                      const SizedBox(height: 12),
+
+                      // ─── RAINFALL-BASED FLOOD RISK FORECAST (advisory only — not a live water-level sensor reading) ───────────
+                      const FloodRiskCard(baseUrl: kApiBaseUrl),
+
                       const SizedBox(height: 28),
 
-                      // ── My Incident Log — clickable icon ──────────────
                       GestureDetector(
                         onTap: () => _showIncidentLogSheet(context),
                         child: Container(
@@ -530,7 +528,6 @@ class _ResidentDashboardState extends State<ResidentDashboard>
                         ),
                       ),
                       const SizedBox(height: 32),
-                      // ── Latest Announcements Section ────────────────────────
                       const Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -554,7 +551,6 @@ class _ResidentDashboardState extends State<ResidentDashboard>
                         ],
                       ),
                       const SizedBox(height: 16),
-                      // The Preview Card
                       const AnnouncementCard(
                         category: 'SERVICES',
                         date: 'MARCH 13, 2026',
@@ -567,7 +563,6 @@ class _ResidentDashboardState extends State<ResidentDashboard>
                   ),
                 ),
               ),
-        // ── Expandable FAB ───────────────────────────────────────────────────
         floatingActionButton: _ExpandableFAB(
           isExpanded: _fabExpanded,
           fabAnim: _fabAnim,
@@ -601,7 +596,6 @@ class _ResidentDashboardState extends State<ResidentDashboard>
           ),
           child: Column(
             children: [
-              // Handle
               const SizedBox(height: 12),
               Container(
                 width: 36,
@@ -612,7 +606,6 @@ class _ResidentDashboardState extends State<ResidentDashboard>
                 ),
               ),
               const SizedBox(height: 16),
-              // Header
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
@@ -662,7 +655,6 @@ class _ResidentDashboardState extends State<ResidentDashboard>
               const SizedBox(height: 12),
               Container(height: 1, color: AppColors.border),
               const SizedBox(height: 8),
-              // Body
               Expanded(
                 child: _loadingReports
                     ? const Center(child: CircularProgressIndicator(color: AppColors.electric, strokeWidth: 2))
@@ -743,7 +735,6 @@ class _ResidentDashboardState extends State<ResidentDashboard>
   }
 }
 
-// ─── Expandable FAB ───────────────────────────────────────────────────────────
 class _ExpandableFAB extends StatefulWidget {
   final bool isExpanded;
   final Animation<double> fabAnim;
@@ -793,7 +784,6 @@ class _ExpandableFABState extends State<_ExpandableFAB>
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        // ── Mini FAB: Document Request ────────────────────────────────────
         AnimatedBuilder(
           animation: widget.fabAnim,
           builder: (_, child) => Transform.scale(
@@ -809,7 +799,6 @@ class _ExpandableFABState extends State<_ExpandableFAB>
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Label
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 10,
@@ -854,8 +843,6 @@ class _ExpandableFABState extends State<_ExpandableFAB>
             ),
           ),
         ),
-
-        // ── Mini FAB: Submit Incident ─────────────────────────────────────
         AnimatedBuilder(
           animation: widget.fabAnim,
           builder: (_, child) => Transform.scale(
@@ -915,8 +902,6 @@ class _ExpandableFABState extends State<_ExpandableFAB>
             ),
           ),
         ),
-
-        // ── Main FAB (toggle) ─────────────────────────────────────────────
         AnimatedBuilder(
           animation: _glow,
           builder: (_, child) => Container(
@@ -983,7 +968,6 @@ class _ExpandableFABState extends State<_ExpandableFAB>
   }
 }
 
-// ─── Resident Report Detail (read-only) ──────────────────────────────────────
 class _ResidentReportDetailScreen extends StatelessWidget {
   final _Report report;
   final Color severityColor;
@@ -1236,7 +1220,6 @@ class _MapPin extends StatelessWidget {
   );
 }
 
-// ─── Widgets ──────────────────────────────────────────────────────────────────
 class _SectionLabel extends StatelessWidget {
   final String label;
   final String? tag;
@@ -1484,7 +1467,6 @@ class _Badge extends StatelessWidget {
   );
 }
 
-// ─── Quick Action Card ────────────────────────────────────────────────────────
 class _QuickActionCard extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -1547,7 +1529,6 @@ class _QuickActionCard extends StatelessWidget {
   }
 }
 
-// ─── Painters ─────────────────────────────────────────────────────────────────
 class _MiniHexPainter extends CustomPainter {
   final Color fillColor;
   final Color strokeColor;
